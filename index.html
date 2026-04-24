@@ -1059,8 +1059,8 @@
         </div>
         <div class="pricing-toggle fade-up">
           <span class="active" id="weekly-label">Montly</span>
-          <div class="toggle-switch" id="billing-toggle" role="switch" aria-checked="true" tabindex="0" aria-label="Toggle billing period"></div>
-          <span id="monthly-label">Yearly</span>
+          <div class="toggle-switch" id="billing-toggle" role="switch" aria-checked="false" tabindex="0" aria-label="Toggle billing period"></div>
+          <span class="" id="monthly-label">Yearly</span>
         </div>
         <div class="pricing-cards">
           <div class="pricing-card fade-up">
@@ -1282,40 +1282,40 @@
 
     // Pricing toggle
     const toggle = document.getElementById('billing-toggle');
-    const weeklyLabel = document.getElementById('weekly-label');
-    const monthlyLabel = document.getElementById('monthly-label');
+    const monthlyLabel = document.getElementById('weekly-label');
+    const yearlyLabel = document.getElementById('monthly-label');
     const weeklyPrice = document.getElementById('weekly-price');
     const dailyPrice = document.getElementById('daily-price');
 
-    let isWeekly = true;
+    let isMonthly = true;
 
     function updatePricing() {
-      if (isWeekly) {
+      if (isMonthly) {
         weeklyPrice.innerHTML = '$5<span>/month</span>';
         dailyPrice.innerHTML = '$8<span>/month</span>';
-        weeklyLabel.classList.add('active');
-        monthlyLabel.classList.remove('active');
+        monthlyLabel.classList.add('active');
+        yearlyLabel.classList.remove('active');
         toggle.classList.add('active');
         toggle.setAttribute('aria-checked', 'true');
       } else {
-        weeklyPrice.innerHTML = '$50<span>/month</span>';
+        weeklyPrice.innerHTML = '$50<span>/year</span>';
         dailyPrice.innerHTML = '$80<span>/year</span>';
-        monthlyLabel.classList.add('active');
-        weeklyLabel.classList.remove('active');
+        yearlyLabel.classList.add('active');
+        monthlyLabel.classList.remove('active');
         toggle.classList.remove('active');
         toggle.setAttribute('aria-checked', 'false');
       }
     }
 
     toggle.addEventListener('click', () => {
-      isWeekly = !isWeekly;
+      isMonthly = !isMonthly;
       updatePricing();
     });
 
     toggle.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        isWeekly = !isWeekly;
+        isMonthly = !isMonthly;
         updatePricing();
       }
     });
@@ -1339,14 +1339,6 @@
   </script>
 
 <script>
-/**
- * Iframe 元素高亮注入脚本
- * 需要在目标网站中引入此脚本来支持跨域 iframe 高亮功能
- *
- * 使用方法：
- * 1. 将此脚本添加到目标网站的 HTML 中
- * 2. 或通过浏览器扩展、用户脚本等方式注入
- */
 
 (function () {
   "use strict";
