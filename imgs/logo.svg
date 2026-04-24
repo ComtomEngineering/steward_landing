@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Network-style S logo -->
+  <defs>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+  </defs>
+  <!-- S shape with network connections -->
+  <g stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round">
+    <!-- Outer S frame -->
+    <path d="M75 20 L25 20 L25 40 L50 40 L50 45 L30 45 L30 55 L50 55 L50 60 L25 60 L25 80 L75 80"/>
+    <!-- Inner connections forming network -->
+    <line x1="30" y1="20" x2="40" y2="28"/>
+    <line x1="40" y1="20" x2="50" y2="28"/>
+    <line x1="50" y1="20" x2="60" y2="28"/>
+    <line x1="35" y1="32" x2="45" y2="40"/>
+    <line x1="45" y1="32" x2="55" y2="40"/>
+    <line x1="40" y1="20" x2="40" y2="32"/>
+    <line x1="50" y1="20" x2="50" y2="32"/>
+    <line x1="30" y1="45" x2="40" y2="45"/>
+    <line x1="40" y1="45" x2="50" y2="45"/>
+    <line x1="35" y1="55" x2="45" y2="55"/>
+    <line x1="45" y1="55" x2="55" y2="55"/>
+    <line x1="55" y1="55" x2="65" y2="65"/>
+    <line x1="65" y1="55" x2="70" y2="68"/>
+    <line x1="70" y1="55" x2="75" y2="68"/>
+    <line x1="60" y1="68" x2="70" y2="75"/>
+    <line x1="70" y1="68" x2="80" y2="75"/>
+  </g>
+  <!-- Nodes -->
+  <g fill="#FFFFFF" stroke="#7C3AED" stroke-width="2">
+    <!-- Top row -->
+    <circle cx="30" cy="20" r="4"/>
+    <circle cx="40" cy="20" r="4"/>
+    <circle cx="50" cy="20" r="4"/>
+    <circle cx="60" cy="20" r="4"/>
+    <circle cx="70" cy="20" r="4"/>
+    <!-- Middle top -->
+    <circle cx="35" cy="32" r="4"/>
+    <circle cx="45" cy="32" r="4"/>
+    <circle cx="55" cy="32" r="4"/>
+    <circle cx="65" cy="32" r="4"/>
+    <!-- Center horizontal -->
+    <circle cx="30" cy="45" r="4"/>
+    <circle cx="40" cy="45" r="4"/>
+    <circle cx="50" cy="45" r="4"/>
+    <circle cx="60" cy="45" r="4"/>
+    <circle cx="70" cy="45" r="4"/>
+    <!-- Middle bottom -->
+    <circle cx="35" cy="55" r="4"/>
+    <circle cx="45" cy="55" r="4"/>
+    <circle cx="55" cy="55" r="4"/>
+    <circle cx="65" cy="55" r="4"/>
+    <circle cx="70" cy="55" r="4"/>
+    <!-- Bottom row -->
+    <circle cx="30" cy="68" r="4"/>
+    <circle cx="40" cy="68" r="4"/>
+    <circle cx="55" cy="68" r="4"/>
+    <circle cx="65" cy="68" r="4"/>
+    <circle cx="70" cy="68" r="4"/>
+    <circle cx="40" cy="80" r="4"/>
+    <circle cx="50" cy="80" r="4"/>
+    <circle cx="60" cy="80" r="4"/>
+    <circle cx="75" cy="80" r="4"/>
+  </g>
+</svg>
