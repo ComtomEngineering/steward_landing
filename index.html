@@ -1058,14 +1058,14 @@
           <p class="section-subtitle">Start free, upgrade when you're ready.</p>
         </div>
         <div class="pricing-toggle fade-up">
-          <span class="active" id="weekly-label">Weekly</span>
+          <span class="active" id="weekly-label">Montly</span>
           <div class="toggle-switch" id="billing-toggle" role="switch" aria-checked="true" tabindex="0" aria-label="Toggle billing period"></div>
-          <span id="monthly-label">Monthly</span>
+          <span id="monthly-label">Yearly</span>
         </div>
         <div class="pricing-cards">
           <div class="pricing-card fade-up">
             <h3>Weekly Digest</h3>
-            <div class="price" id="weekly-price">$5<span>/month</span></div>
+            <div class="price" id="weekly-price">$4<span>/month</span></div>
             <p class="description">Perfect for staying current with a weekly roundup of the most important AI developments.</p>
             <ul class="pricing-features">
               <li>
@@ -1292,14 +1292,14 @@
     function updatePricing() {
       if (isWeekly) {
         weeklyPrice.innerHTML = '$5<span>/month</span>';
-        dailyPrice.innerHTML = '$7<span>/month</span>';
+        dailyPrice.innerHTML = '$8<span>/month</span>';
         weeklyLabel.classList.add('active');
         monthlyLabel.classList.remove('active');
         toggle.classList.add('active');
         toggle.setAttribute('aria-checked', 'true');
       } else {
-        weeklyPrice.innerHTML = '$45<span>/month</span>';
-        dailyPrice.innerHTML = '$60<span>/month</span>';
+        weeklyPrice.innerHTML = '$50<span>/month</span>';
+        dailyPrice.innerHTML = '$80<span>/year</span>';
         monthlyLabel.classList.add('active');
         weeklyLabel.classList.remove('active');
         toggle.classList.remove('active');
