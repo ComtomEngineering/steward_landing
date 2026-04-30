@@ -1,1791 +1,2773 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Steward - Your AI-curated news briefing. Save hours. Stay informed.">
-  <title>Steward - AI-Curated News Briefing</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-purple: #7C3AED;
-      --deep-purple: #5B21B6;
-      --light-purple: #A78BFA;
-      --soft-lavender: #EDE9FE;
-      --accent-pink: #EC4899;
-      --bg-white: #FFFFFF;
-      --bg-off-white: #FAFAFA;
-      --text-primary: #1F2937;
-      --text-secondary: #6B7280;
-      --gray-300: #D1D5DB;
-      --gray-400: #9CA3AF;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --transition-fast: 200ms ease;
-      --transition-normal: 400ms ease-out;
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      color: var(--text-primary);
-      background: var(--bg-white);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Animation Utilities */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity var(--transition-normal), transform var(--transition-normal);
-    }
-
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--primary-purple) 50%, #8B5CF6 100%);
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-    }
-
-    .hero-gradient-mesh {
-      position: absolute;
-      width: 150%;
-      height: 150%;
-      top: -25%;
-      left: -25%;
-      background: radial-gradient(ellipse at 30% 20%, rgba(167, 139, 250, 0.4) 0%, transparent 50%),
-                  radial-gradient(ellipse at 70% 80%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
-                  radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, 0.2) 0%, transparent 60%);
-      animation: meshMove 15s ease-in-out infinite;
-    }
-
-    @keyframes meshMove {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      33% { transform: translate(2%, 1%) rotate(1deg); }
-      66% { transform: translate(-1%, 2%) rotate(-1deg); }
-    }
-
-    .floating-graph {
-      position: absolute;
-      opacity: 0.15;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .floating-graph:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-    .floating-graph:nth-child(2) { top: 20%; right: 15%; animation-delay: 1s; }
-    .floating-graph:nth-child(3) { bottom: 30%; left: 5%; animation-delay: 2s; }
-    .floating-graph:nth-child(4) { bottom: 20%; right: 10%; animation-delay: 0.5s; }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      max-width: 800px;
-      padding: 0 24px;
-    }
-
-    .hero-logo {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 32px;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      font-weight: 900;
-      color: white;
-      line-height: 1.1;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, #FFFFFF 0%, #EDE9FE 50%, #F9A8D4 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: clamp(1.125rem, 2.5vw, 1.375rem);
-      color: rgba(255, 255, 255, 0.85);
-      margin-bottom: 40px;
-      line-height: 1.6;
-    }
-
-    .hero-ctas {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 48px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 16px 32px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: all var(--transition-fast);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-pink) 0%, var(--primary-purple) 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
-      filter: brightness(1.05);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .trust-badges {
-      display: flex;
-      gap: 32px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .trust-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.875rem;
-    }
-
-    .trust-badge svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .scroll-indicator {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    .scroll-indicator svg {
-      width: 32px;
-      height: 32px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(10px); }
-    }
-
-    /* Features Section */
-    .features {
-      padding: 80px 0;
-      background: var(--bg-off-white);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .section-header {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto 64px;
-    }
-
-    .section-label {
-      display: inline-block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--primary-purple);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-size: clamp(2rem, 4vw, 2.5rem);
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1.2;
-      margin-bottom: 16px;
-    }
-
-    .section-subtitle {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-    }
-
-    @media (max-width: 1024px) {
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      .features {
-        padding: 48px 0;
-      }
-    }
-
-    .feature-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      box-shadow: var(--shadow-md);
-      transition: all var(--transition-fast);
-    }
-
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .feature-icon {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, var(--soft-lavender) 0%, var(--soft-lavender) 100%);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-    }
-
-    .feature-icon svg {
-      width: 28px;
-      height: 28px;
-      color: var(--primary-purple);
-    }
-
-    .feature-card h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-    }
-
-    .feature-card p {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    .features-decoration {
-      position: absolute;
-      right: -100px;
-      top: 50%;
-      transform: translateY(-50%);
-      opacity: 0.1;
-    }
-
-    /* How It Works Section */
-    .how-it-works {
-      padding: 80px 0;
-      background: white;
-    }
-
-    .timeline {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      position: relative;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      top: 40px;
-      left: 15%;
-      right: 15%;
-      height: 2px;
-      background: linear-gradient(90deg, var(--light-purple) 0%, var(--primary-purple) 50%, var(--light-purple) 100%);
-    }
-
-    .timeline-step {
-      flex: 1;
-      text-align: center;
-      position: relative;
-      padding: 0 20px;
-    }
-
-    .step-number {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--deep-purple) 100%);
-      color: white;
-      font-size: 1.5rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
-      position: relative;
-      z-index: 2;
-    }
-
-    .step-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 16px;
-      color: var(--primary-purple);
-    }
-
-    .timeline-step h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .timeline-step p {
-      font-size: 0.9375rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    @media (max-width: 768px) {
-      .timeline {
-        flex-direction: column;
-        gap: 48px;
-      }
-      .timeline::before {
-        display: none;
-      }
-      .how-it-works {
-        padding: 48px 0;
-      }
-    }
-
-    /* Pricing Section */
-    .pricing {
-      padding: 80px 0;
-      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--primary-purple) 100%);
-      position: relative;
-    }
-
-    .pricing .section-header .section-label {
-      color: var(--light-purple);
-    }
-
-    .pricing .section-title {
-      color: white;
-    }
-
-    .pricing .section-subtitle {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .pricing-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 48px;
-    }
-
-    .pricing-toggle span {
-      font-size: 1rem;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .pricing-toggle span.active {
-      color: white;
-    }
-
-    .toggle-switch {
-      width: 56px;
-      height: 28px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 14px;
-      position: relative;
-      cursor: pointer;
-      transition: background var(--transition-fast);
-    }
-
-    .toggle-switch.active {
-      background: var(--accent-pink);
-    }
-
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      background: white;
-      border-radius: 50%;
-      top: 3px;
-      left: 3px;
-      transition: transform var(--transition-fast);
-    }
-
-    .toggle-switch.active::after {
-      transform: translateX(28px);
-    }
-
-    .pricing-cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    @media (max-width: 768px) {
-      .pricing-cards {
-        grid-template-columns: 1fr;
-      }
-      .pricing {
-        padding: 48px 0;
-      }
-    }
-
-    .pricing-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 40px;
-      position: relative;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .pricing-card.popular {
-      border: 2px solid var(--accent-pink);
-    }
-
-    .popular-badge {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--accent-pink) 0%, #F472B6 100%);
-      color: white;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 6px 16px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .pricing-card h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .pricing-card .price {
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .pricing-card .price span {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
-    .pricing-card .description {
-      font-size: 0.9375rem;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
-
-    .pricing-features {
-      list-style: none;
-      margin-bottom: 32px;
-    }
-
-    .pricing-features li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.9375rem;
-      color: var(--text-primary);
-      padding: 8px 0;
-    }
-
-    .pricing-features li svg {
-      width: 20px;
-      height: 20px;
-      color: var(--primary-purple);
-      flex-shrink: 0;
-    }
-
-    .btn-pricing {
-      width: 100%;
-      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--primary-purple) 100%);
-      color: white;
-    }
-
-    .btn-pricing:hover {
-      filter: brightness(1.1);
-    }
-
-    /* Testimonials Section */
-    .testimonials {
-      padding: 80px 0;
-      background: white;
-      position: relative;
-    }
-
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-    }
-
-    @media (max-width: 1024px) {
-      .testimonials-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .testimonial-card {
-      background: var(--bg-off-white);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      position: relative;
-    }
-
-    .stars {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 16px;
-    }
-
-    .stars svg {
-      width: 18px;
-      height: 18px;
-      color: #F59E0B;
-    }
-
-    .testimonial-card blockquote {
-      font-size: 1rem;
-      color: var(--text-primary);
-      line-height: 1.7;
-      margin-bottom: 24px;
-      font-style: italic;
-    }
-
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .author-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--light-purple) 100%);
-    }
-
-    .author-info h4 {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 2px;
-    }
-
-    .author-info p {
-      font-size: 0.8125rem;
-      color: var(--text-secondary);
-    }
-
-    /* Final CTA Section */
-    .final-cta {
-      padding: 100px 0;
-      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--primary-purple) 50%, #8B5CF6 100%);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .final-cta::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 100%, rgba(236, 72, 153, 0.2) 0%, transparent 60%);
-    }
-
-    .final-cta-content {
-      position: relative;
-      z-index: 2;
-    }
-
-    .final-cta h2 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
-      color: white;
-      margin-bottom: 16px;
-    }
-
-    .final-cta p {
-      font-size: 1.125rem;
-      color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 40px;
-    }
-
-    .cta-form {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      max-width: 500px;
-      margin: 0 auto 16px;
-    }
-
-    .cta-form input {
-      flex: 1;
-      min-width: 280px;
-      height: 52px;
-      padding: 0 20px;
-      font-size: 1rem;
-      border: none;
-      border-radius: var(--radius-md);
-      background: white;
-      color: var(--text-primary);
-    }
-
-    .cta-form input::placeholder {
-      color: var(--gray-400);
-    }
-
-    .cta-form input:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.5);
-    }
-
-    .cta-form button {
-      height: 52px;
-      padding: 0 32px;
-      font-size: 1rem;
-    }
-
-    .privacy-text {
-      font-size: 0.8125rem;
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    /* Footer */
-    footer {
-      background: var(--text-primary);
-      padding: 64px 0 32px;
-    }
-
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 32px;
-      margin-bottom: 48px;
-    }
-
-    .footer-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .footer-logo svg {
-      width: 40px;
-      height: 40px;
-    }
-
-    .footer-logo span {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: white;
-    }
-
-    .footer-nav {
-      display: flex;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-
-    .footer-nav a {
-      font-size: 0.9375rem;
-      color: var(--gray-400);
-      text-decoration: none;
-      transition: color var(--transition-fast);
-    }
-
-    .footer-nav a:hover {
-      color: white;
-    }
-
-    .social-links {
-      display: flex;
-      gap: 16px;
-    }
-
-    .social-links a {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition-fast);
-    }
-
-    .social-links a:hover {
-      background: var(--primary-purple);
-      transform: translateY(-2px);
-    }
-
-    .social-links svg {
-      width: 20px;
-      height: 20px;
-      color: white;
-    }
-
-    .footer-bottom {
-      text-align: center;
-      padding-top: 32px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .footer-bottom p {
-      font-size: 0.8125rem;
-      color: var(--gray-400);
-    }
-
-    @media (max-width: 768px) {
-      .footer-content {
-        flex-direction: column;
-        text-align: center;
-      }
-    }
-
-    /* Focus states */
-    :focus-visible {
-      outline: 2px solid var(--primary-purple);
-      outline-offset: 2px;
-    }
-
-    /* Skip link */
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      background: var(--primary-purple);
-      color: white;
-      padding: 8px 16px;
-      z-index: 100;
-      transition: top 0.3s;
-    }
-
-    .skip-link:focus {
-      top: 0;
-    }
-  </style>
-</head>
-<body>
-  <a href="#main" class="skip-link">Skip to main content</a>
-
-  <!-- Hero Section -->
-  <header class="hero">
-    <div class="hero-bg">
-      <div class="hero-gradient-mesh"></div>
-      <svg class="floating-graph" width="200" height="200" viewBox="0 0 100 100" fill="none">
-        <circle cx="20" cy="20" r="4" fill="white"/>
-        <circle cx="80" cy="20" r="4" fill="white"/>
-        <circle cx="50" cy="50" r="4" fill="white"/>
-        <circle cx="20" cy="80" r="4" fill="white"/>
-        <circle cx="80" cy="80" r="4" fill="white"/>
-        <line x1="20" y1="20" x2="80" y2="20" stroke="white" stroke-width="1"/>
-        <line x1="20" y1="20" x2="50" y2="50" stroke="white" stroke-width="1"/>
-        <line x1="80" y1="20" x2="50" y2="50" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="50" x2="20" y2="80" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="50" x2="80" y2="80" stroke="white" stroke-width="1"/>
-      </svg>
-      <svg class="floating-graph" width="150" height="150" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="10" r="3" fill="white"/>
-        <circle cx="20" cy="40" r="3" fill="white"/>
-        <circle cx="80" cy="40" r="3" fill="white"/>
-        <circle cx="50" cy="70" r="3" fill="white"/>
-        <circle cx="30" cy="90" r="3" fill="white"/>
-        <circle cx="70" cy="90" r="3" fill="white"/>
-        <line x1="50" y1="10" x2="20" y2="40" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="10" x2="80" y2="40" stroke="white" stroke-width="1"/>
-        <line x1="20" y1="40" x2="80" y2="40" stroke="white" stroke-width="1"/>
-        <line x1="20" y1="40" x2="50" y2="70" stroke="white" stroke-width="1"/>
-        <line x1="80" y1="40" x2="50" y2="70" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="70" x2="30" y2="90" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="70" x2="70" y2="90" stroke="white" stroke-width="1"/>
-      </svg>
-      <svg class="floating-graph" width="180" height="180" viewBox="0 0 100 100" fill="none">
-        <circle cx="30" cy="30" r="3" fill="white"/>
-        <circle cx="70" cy="30" r="3" fill="white"/>
-        <circle cx="50" cy="60" r="3" fill="white"/>
-        <circle cx="30" cy="80" r="3" fill="white"/>
-        <circle cx="70" cy="80" r="3" fill="white"/>
-        <line x1="30" y1="30" x2="70" y2="30" stroke="white" stroke-width="1"/>
-        <line x1="30" y1="30" x2="50" y2="60" stroke="white" stroke-width="1"/>
-        <line x1="70" y1="30" x2="50" y2="60" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="60" x2="30" y2="80" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="60" x2="70" y2="80" stroke="white" stroke-width="1"/>
-      </svg>
-      <svg class="floating-graph" width="160" height="160" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="20" r="3" fill="white"/>
-        <circle cx="20" cy="50" r="3" fill="white"/>
-        <circle cx="80" cy="50" r="3" fill="white"/>
-        <circle cx="35" cy="75" r="3" fill="white"/>
-        <circle cx="65" cy="75" r="3" fill="white"/>
-        <line x1="50" y1="20" x2="20" y2="50" stroke="white" stroke-width="1"/>
-        <line x1="50" y1="20" x2="80" y2="50" stroke="white" stroke-width="1"/>
-        <line x1="20" y1="50" x2="35" y2="75" stroke="white" stroke-width="1"/>
-        <line x1="80" y1="50" x2="65" y2="75" stroke="white" stroke-width="1"/>
-        <line x1="35" y1="75" x2="65" y2="75" stroke="white" stroke-width="1"/>
-      </svg>
-    </div>
-    <div class="hero-content">
-      <img src="imgs/logo.svg" alt="Steward Logo" class="hero-logo" width="80" height="80">
-      <h1 class="fade-up">Your AI-Curated News Briefing</h1>
-      <p class="hero-subtitle fade-up" style="transition-delay: 100ms;">Save hours. Stay informed. Get the most relevant AI news delivered daily or weekly.</p>
-      <div class="hero-ctas fade-up" style="transition-delay: 200ms;">
-        <a href="#pricing" class="btn btn-primary">Subscribe Now</a>
-        <a href="#features" class="btn btn-secondary">Learn More</a>
-      </div>
-      <div class="trust-badges fade-up" style="transition-delay: 300ms;">
-        <div class="trust-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>50,000+ subscribers</span>
-        </div>
-        <div class="trust-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span>3+ hours saved weekly</span>
-        </div>
-      </div>
-    </div>
-    <a href="#features" class="scroll-indicator" aria-label="Scroll to features">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
-      </svg>
-    </a>
-  </header>
-
-  <main id="main">
-    <!-- Features Section -->
-    <section id="features" class="features">
-      <div class="container">
-        <div class="section-header fade-up">
-          <span class="section-label">Features</span>
-          <h2 class="section-title">Everything you need to stay informed</h2>
-          <p class="section-subtitle">Our AI system does the heavy lifting so you can focus on what matters.</p>
-        </div>
-        <div class="features-grid">
-          <div class="feature-card fade-up">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
-                <path d="M12 6v6l4 2"/>
-              </svg>
-            </div>
-            <h3>Smart Curation</h3>
-            <p>AI analyzes thousands of sources to surface only what matters to you, learning from your feedback continuously.</p>
-          </div>
-          <div class="feature-card fade-up" style="transition-delay: 100ms;">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-              </svg>
-            </div>
-            <h3>Time Saving</h3>
-            <p>One briefing instead of 3 hours of scrolling. Every morning, delivered to your inbox at your preferred time.</p>
-          </div>
-          <div class="feature-card fade-up" style="transition-delay: 200ms;">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </div>
-            <h3>Fully Configurable</h3>
-            <p>Daily or weekly. Deep dive or quick scan. Choose your topics, frequency, and preferred time. You're in control.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="how-it-works">
-      <div class="container">
-        <div class="section-header fade-up">
-          <span class="section-label">How It Works</span>
-          <h2 class="section-title">Three steps to stay informed</h2>
-          <p class="section-subtitle">Getting started takes less than 2 minutes.</p>
-        </div>
-        <div class="timeline">
-          <div class="timeline-step fade-up">
-            <div class="step-number">1</div>
-            <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 20h9"/>
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
-            <h3>Choose Your Preferences</h3>
-            <p>Select your topics, preferred frequency, and delivery time that fits your schedule.</p>
-          </div>
-          <div class="timeline-step fade-up" style="transition-delay: 100ms;">
-            <div class="step-number">2</div>
-            <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
-            <h3>AI Curates</h3>
-            <p>Our system learns your interests and scours thousands of sources to find the most relevant news.</p>
-          </div>
-          <div class="timeline-step fade-up" style="transition-delay: 200ms;">
-            <div class="step-number">3</div>
-            <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <h3>Receive Daily</h3>
-            <p>Get your personalized briefing delivered to your inbox. Short summaries, no fluff, just the news that matters.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing" class="pricing">
-      <div class="container">
-        <div class="section-header fade-up">
-          <span class="section-label">Pricing</span>
-          <h2 class="section-title">Simple, transparent pricing</h2>
-          <p class="section-subtitle">Try it free for a week, upgrade when you're ready.<br/>Select a daily or weekly cadence acording to your needs.</p>
-        </div>
-        <div class="pricing-toggle fade-up">
-          <span class="active" id="weekly-label">Montly</span>
-          <div class="toggle-switch" id="billing-toggle" role="switch" aria-checked="false" tabindex="0" aria-label="Toggle billing period"></div>
-          <span class="" id="monthly-label">Yearly</span>
-        </div>
-        <div class="pricing-cards">
-          <div class="pricing-card fade-up">
-            <h3>Weekly Digest</h3>
-            <div class="price" id="weekly-price">$4.99<span>/month</span></div>
-            <p class="description">Perfect for staying current with a weekly roundup of the most important AI developments.</p>
-            <ul class="pricing-features">
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="Steward - Your AI-curated news briefing. Save hours. Stay informed."
+        />
+        <title>Steward - AI-Curated News Briefing</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --primary-purple: #7c3aed;
+                --deep-purple: #5b21b6;
+                --light-purple: #a78bfa;
+                --soft-lavender: #ede9fe;
+                --accent-pink: #ec4899;
+                --bg-white: #ffffff;
+                --bg-off-white: #fafafa;
+                --text-primary: #1f2937;
+                --text-secondary: #6b7280;
+                --gray-300: #d1d5db;
+                --gray-400: #9ca3af;
+                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+                --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+                --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+                --radius-sm: 8px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --transition-fast: 200ms ease;
+                --transition-normal: 400ms ease-out;
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                font-family:
+                    "Inter",
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                font-size: 16px;
+                line-height: 1.5;
+                color: var(--text-primary);
+                background: var(--bg-white);
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+
+            /* Animation Utilities */
+            .fade-up {
+                opacity: 0;
+                transform: translateY(30px);
+                transition:
+                    opacity var(--transition-normal),
+                    transform var(--transition-normal);
+            }
+
+            .fade-up.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Hero Section */
+            .hero {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                overflow: hidden;
+                background: linear-gradient(
+                    135deg,
+                    var(--deep-purple) 0%,
+                    var(--primary-purple) 50%,
+                    #8b5cf6 100%
+                );
+            }
+
+            .hero-bg {
+                position: absolute;
+                inset: 0;
+                overflow: hidden;
+            }
+
+            .hero-gradient-mesh {
+                position: absolute;
+                width: 150%;
+                height: 150%;
+                top: -25%;
+                left: -25%;
+                background:
+                    radial-gradient(
+                        ellipse at 30% 20%,
+                        rgba(167, 139, 250, 0.4) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        ellipse at 70% 80%,
+                        rgba(236, 72, 153, 0.3) 0%,
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        ellipse at 50% 50%,
+                        rgba(124, 58, 237, 0.2) 0%,
+                        transparent 60%
+                    );
+                animation: meshMove 15s ease-in-out infinite;
+            }
+
+            @keyframes meshMove {
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+                33% {
+                    transform: translate(2%, 1%) rotate(1deg);
+                }
+                66% {
+                    transform: translate(-1%, 2%) rotate(-1deg);
+                }
+            }
+
+            .floating-graph {
+                position: absolute;
+                opacity: 0.15;
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .floating-graph:nth-child(1) {
+                top: 10%;
+                left: 10%;
+                animation-delay: 0s;
+            }
+            .floating-graph:nth-child(2) {
+                top: 20%;
+                right: 15%;
+                animation-delay: 1s;
+            }
+            .floating-graph:nth-child(3) {
+                bottom: 30%;
+                left: 5%;
+                animation-delay: 2s;
+            }
+            .floating-graph:nth-child(4) {
+                bottom: 20%;
+                right: 10%;
+                animation-delay: 0.5s;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 10;
+                text-align: center;
+                max-width: 800px;
+                padding: 0 24px;
+            }
+
+            .hero-logo {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 32px;
+            }
+
+            .hero h1 {
+                font-size: clamp(2.5rem, 6vw, 4rem);
+                font-weight: 900;
+                color: white;
+                line-height: 1.1;
+                margin-bottom: 24px;
+                background: linear-gradient(
+                    135deg,
+                    #ffffff 0%,
+                    #ede9fe 50%,
+                    #f9a8d4 100%
+                );
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .hero-subtitle {
+                font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+                color: rgba(255, 255, 255, 0.85);
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+
+            .hero-ctas {
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: 48px;
+            }
+
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 16px 32px;
+                font-size: 1rem;
+                font-weight: 600;
+                border-radius: var(--radius-md);
+                text-decoration: none;
+                cursor: pointer;
+                border: none;
+                transition: all var(--transition-fast);
+            }
+
+            .btn-primary {
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-pink) 0%,
+                    var(--primary-purple) 100%
+                );
+                color: white;
+                box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+                filter: brightness(1.05);
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                backdrop-filter: blur(10px);
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.2);
+                border-color: rgba(255, 255, 255, 0.5);
+            }
+
+            .trust-badges {
+                display: flex;
+                gap: 32px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .trust-badge {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.875rem;
+            }
+
+            .trust-badge svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .scroll-indicator {
+                position: absolute;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                animation: bounce 2s ease-in-out infinite;
+            }
+
+            .scroll-indicator svg {
+                width: 32px;
+                height: 32px;
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+            @keyframes bounce {
+                0%,
+                100% {
+                    transform: translateX(-50%) translateY(0);
+                }
+                50% {
+                    transform: translateX(-50%) translateY(10px);
+                }
+            }
+
+            /* Features Section */
+            .features {
+                padding: 80px 0;
+                background: var(--bg-off-white);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .section-header {
+                text-align: center;
+                max-width: 600px;
+                margin: 0 auto 64px;
+            }
+
+            .section-label {
+                display: inline-block;
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: var(--primary-purple);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 16px;
+            }
+
+            .section-title {
+                font-size: clamp(2rem, 4vw, 2.5rem);
+                font-weight: 800;
+                color: var(--text-primary);
+                line-height: 1.2;
+                margin-bottom: 16px;
+            }
+
+            .section-subtitle {
+                font-size: 1.125rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
+            }
+
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 32px;
+            }
+
+            @media (max-width: 1024px) {
+                .features-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .features-grid {
+                    grid-template-columns: 1fr;
+                }
+                .features {
+                    padding: 48px 0;
+                }
+            }
+
+            .feature-card {
+                background: white;
+                border-radius: var(--radius-lg);
+                padding: 32px;
+                box-shadow: var(--shadow-md);
+                transition: all var(--transition-fast);
+            }
+
+            .feature-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .feature-icon {
+                width: 56px;
+                height: 56px;
+                background: linear-gradient(
+                    135deg,
+                    var(--soft-lavender) 0%,
+                    var(--soft-lavender) 100%
+                );
+                border-radius: var(--radius-md);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 24px;
+            }
+
+            .feature-icon svg {
+                width: 28px;
+                height: 28px;
+                color: var(--primary-purple);
+            }
+
+            .feature-card h3 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 12px;
+            }
+
+            .feature-card p {
+                font-size: 1rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
+            }
+
+            .features-decoration {
+                position: absolute;
+                right: -100px;
+                top: 50%;
+                transform: translateY(-50%);
+                opacity: 0.1;
+            }
+
+            /* How It Works Section */
+            .how-it-works {
+                padding: 80px 0;
+                background: white;
+            }
+
+            .timeline {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                position: relative;
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            .timeline::before {
+                content: "";
+                position: absolute;
+                top: 40px;
+                left: 15%;
+                right: 15%;
+                height: 2px;
+                background: linear-gradient(
+                    90deg,
+                    var(--light-purple) 0%,
+                    var(--primary-purple) 50%,
+                    var(--light-purple) 100%
+                );
+            }
+
+            .timeline-step {
+                flex: 1;
+                text-align: center;
+                position: relative;
+                padding: 0 20px;
+            }
+
+            .step-number {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-purple) 0%,
+                    var(--deep-purple) 100%
+                );
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+                box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+                position: relative;
+                z-index: 2;
+            }
+
+            .step-icon {
+                width: 48px;
+                height: 48px;
+                margin: 0 auto 16px;
+                color: var(--primary-purple);
+            }
+
+            .timeline-step h3 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 8px;
+            }
+
+            .timeline-step p {
+                font-size: 0.9375rem;
+                color: var(--text-secondary);
+                line-height: 1.5;
+            }
+
+            @media (max-width: 768px) {
+                .timeline {
+                    flex-direction: column;
+                    gap: 48px;
+                }
+                .timeline::before {
+                    display: none;
+                }
+                .how-it-works {
+                    padding: 48px 0;
+                }
+            }
+
+            /* Pricing Section */
+            .pricing {
+                padding: 80px 0;
+                background: linear-gradient(
+                    135deg,
+                    var(--deep-purple) 0%,
+                    var(--primary-purple) 100%
+                );
+                position: relative;
+            }
+
+            .pricing .section-header .section-label {
+                color: var(--light-purple);
+            }
+
+            .pricing .section-title {
+                color: white;
+            }
+
+            .pricing .section-subtitle {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            .pricing-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                margin-bottom: 48px;
+            }
+
+            .pricing-toggle span {
+                font-size: 1rem;
+                font-weight: 500;
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            .pricing-toggle span.active {
+                color: white;
+            }
+
+            .toggle-switch {
+                width: 56px;
+                height: 28px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 14px;
+                position: relative;
+                cursor: pointer;
+                transition: background var(--transition-fast);
+            }
+
+            .toggle-switch.active {
+                background: var(--accent-pink);
+            }
+
+            .toggle-switch::after {
+                content: "";
+                position: absolute;
+                width: 22px;
+                height: 22px;
+                background: white;
+                border-radius: 50%;
+                top: 3px;
+                left: 3px;
+                transition: transform var(--transition-fast);
+            }
+
+            .toggle-switch.active::after {
+                transform: translateX(28px);
+            }
+
+            .pricing-cards {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            @media (max-width: 768px) {
+                .pricing-cards {
+                    grid-template-columns: 1fr;
+                }
+                .pricing {
+                    padding: 48px 0;
+                }
+            }
+
+            .pricing-card {
+                background: white;
+                border-radius: var(--radius-lg);
+                padding: 40px;
+                position: relative;
+                box-shadow: var(--shadow-lg);
+            }
+
+            .pricing-card.popular {
+                border: 2px solid var(--accent-pink);
+            }
+
+            .popular-badge {
+                position: absolute;
+                top: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(
+                    135deg,
+                    var(--accent-pink) 0%,
+                    #f472b6 100%
+                );
+                color: white;
+                font-size: 0.75rem;
+                font-weight: 700;
+                padding: 6px 16px;
+                border-radius: 20px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .pricing-card h3 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 8px;
+            }
+
+            .pricing-card .price {
+                font-size: 3rem;
+                font-weight: 900;
+                color: var(--text-primary);
+                margin-bottom: 8px;
+            }
+
+            .pricing-card .price span {
+                font-size: 1rem;
+                font-weight: 500;
+                color: var(--text-secondary);
+            }
+
+            .pricing-card .description {
+                font-size: 0.9375rem;
+                color: var(--text-secondary);
+                margin-bottom: 24px;
+            }
+
+            .pricing-features {
+                list-style: none;
+                margin-bottom: 32px;
+            }
+
+            .pricing-features li {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 0.9375rem;
+                color: var(--text-primary);
+                padding: 8px 0;
+            }
+
+            .pricing-features li svg {
+                width: 20px;
+                height: 20px;
+                color: var(--primary-purple);
+                flex-shrink: 0;
+            }
+
+            .btn-pricing {
+                width: 100%;
+                background: linear-gradient(
+                    135deg,
+                    var(--deep-purple) 0%,
+                    var(--primary-purple) 100%
+                );
+                color: white;
+            }
+
+            .btn-pricing:hover {
+                filter: brightness(1.1);
+            }
+
+            /* Testimonials Section */
+            .testimonials {
+                padding: 80px 0;
+                background: white;
+                position: relative;
+            }
+
+            .testimonials-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 32px;
+            }
+
+            @media (max-width: 1024px) {
+                .testimonials-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .testimonial-card {
+                background: var(--bg-off-white);
+                border-radius: var(--radius-lg);
+                padding: 32px;
+                position: relative;
+            }
+
+            .stars {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 16px;
+            }
+
+            .stars svg {
+                width: 18px;
+                height: 18px;
+                color: #f59e0b;
+            }
+
+            .testimonial-card blockquote {
+                font-size: 1rem;
+                color: var(--text-primary);
+                line-height: 1.7;
+                margin-bottom: 24px;
+                font-style: italic;
+            }
+
+            .testimonial-author {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .author-avatar {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-purple) 0%,
+                    var(--light-purple) 100%
+                );
+            }
+
+            .author-info h4 {
+                font-size: 0.9375rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 2px;
+            }
+
+            .author-info p {
+                font-size: 0.8125rem;
+                color: var(--text-secondary);
+            }
+
+            /* Final CTA Section */
+            .final-cta {
+                padding: 100px 0;
+                background: linear-gradient(
+                    135deg,
+                    var(--deep-purple) 0%,
+                    var(--primary-purple) 50%,
+                    #8b5cf6 100%
+                );
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .final-cta::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(
+                    ellipse at 50% 100%,
+                    rgba(236, 72, 153, 0.2) 0%,
+                    transparent 60%
+                );
+            }
+
+            .final-cta-content {
+                position: relative;
+                z-index: 2;
+            }
+
+            .final-cta h2 {
+                font-size: clamp(2rem, 5vw, 3rem);
+                font-weight: 800;
+                color: white;
+                margin-bottom: 16px;
+            }
+
+            .final-cta p {
+                font-size: 1.125rem;
+                color: rgba(255, 255, 255, 0.8);
+                margin-bottom: 40px;
+            }
+
+            .cta-form {
+                max-width: 500px;
+                margin: 0 auto 16px;
+            }
+
+            .cta-form-container {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            #card-element {
+                background: white;
+                padding: 16px;
+                border-radius: var(--radius-md);
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .form-message {
+                padding: 12px;
+                border-radius: var(--radius-sm);
+                font-size: 0.875rem;
+                display: none;
+                text-align: left;
+            }
+
+            #error-messages {
+                color: #ffcfd7;
+                background: rgba(220, 38, 38, 0.2);
+            }
+
+            #success-messages {
+                color: #d1fae5;
+                background: rgba(5, 150, 105, 0.2);
+            }
+
+            /* Modal Styles */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(4px);
+            }
+
+            .modal-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .modal-content {
+                background: white;
+                padding: 40px;
+                border-radius: var(--radius-lg);
+                max-width: 450px;
+                width: 90%;
+                text-align: center;
+                position: relative;
+                box-shadow: var(--shadow-lg);
+                transform: translateY(20px);
+                transition: transform 0.3s ease;
+            }
+
+            .modal-overlay.active .modal-content {
+                transform: translateY(0);
+            }
+
+            .modal-icon {
+                width: 64px;
+                height: 64px;
+                background: #d1fae5;
+                color: #059669;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+            }
+
+            .modal-icon svg {
+                width: 32px;
+                height: 32px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: var(--text-primary);
+                margin-bottom: 12px;
+            }
+
+            .modal-text {
+                color: var(--text-secondary);
+                line-height: 1.6;
+                margin-bottom: 32px;
+            }
+
+            .modal-text strong {
+                color: var(--text-primary);
+            }
+
+            .btn-modal-close {
+                width: 100%;
+            }
+
+            .cta-form input {
+                width: 100%;
+                height: 52px;
+                padding: 0 20px;
+                font-size: 1rem;
+                border: none;
+                border-radius: var(--radius-md);
+                background: white;
+                color: var(--text-primary);
+            }
+
+            .cta-form input::placeholder {
+                color: var(--gray-400);
+            }
+
+            .cta-form input:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.5);
+            }
+
+            .cta-form button {
+                height: 52px;
+                padding: 0 32px;
+                font-size: 1rem;
+            }
+
+            .privacy-text {
+                font-size: 0.8125rem;
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            /* Footer */
+            footer {
+                background: var(--text-primary);
+                padding: 64px 0 32px;
+            }
+
+            .footer-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 32px;
+                margin-bottom: 48px;
+            }
+
+            .footer-logo {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .footer-logo svg {
+                width: 40px;
+                height: 40px;
+            }
+
+            .footer-logo span {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: white;
+            }
+
+            .footer-nav {
+                display: flex;
+                gap: 32px;
+                flex-wrap: wrap;
+            }
+
+            .footer-nav a {
+                font-size: 0.9375rem;
+                color: var(--gray-400);
+                text-decoration: none;
+                transition: color var(--transition-fast);
+            }
+
+            .footer-nav a:hover {
+                color: white;
+            }
+
+            .social-links {
+                display: flex;
+                gap: 16px;
+            }
+
+            .social-links a {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all var(--transition-fast);
+            }
+
+            .social-links a:hover {
+                background: var(--primary-purple);
+                transform: translateY(-2px);
+            }
+
+            .social-links svg {
+                width: 20px;
+                height: 20px;
+                color: white;
+            }
+
+            .footer-bottom {
+                text-align: center;
+                padding-top: 32px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .footer-bottom p {
+                font-size: 0.8125rem;
+                color: var(--gray-400);
+            }
+
+            @media (max-width: 768px) {
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
+
+            /* Focus states */
+            :focus-visible {
+                outline: 2px solid var(--primary-purple);
+                outline-offset: 2px;
+            }
+
+            /* Skip link */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--primary-purple);
+                color: white;
+                padding: 8px 16px;
+                z-index: 100;
+                transition: top 0.3s;
+            }
+
+            .skip-link:focus {
+                top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="#main" class="skip-link">Skip to main content</a>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-bg">
+                <div class="hero-gradient-mesh"></div>
+                <svg
+                    class="floating-graph"
+                    width="200"
+                    height="200"
+                    viewBox="0 0 100 100"
+                    fill="none"
+                >
+                    <circle cx="20" cy="20" r="4" fill="white" />
+                    <circle cx="80" cy="20" r="4" fill="white" />
+                    <circle cx="50" cy="50" r="4" fill="white" />
+                    <circle cx="20" cy="80" r="4" fill="white" />
+                    <circle cx="80" cy="80" r="4" fill="white" />
+                    <line
+                        x1="20"
+                        y1="20"
+                        x2="80"
+                        y2="20"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="20"
+                        y1="20"
+                        x2="50"
+                        y2="50"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="80"
+                        y1="20"
+                        x2="50"
+                        y2="50"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="50"
+                        x2="20"
+                        y2="80"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="50"
+                        x2="80"
+                        y2="80"
+                        stroke="white"
+                        stroke-width="1"
+                    />
                 </svg>
-                One weekly briefing
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
+                <svg
+                    class="floating-graph"
+                    width="150"
+                    height="150"
+                    viewBox="0 0 100 100"
+                    fill="none"
+                >
+                    <circle cx="50" cy="10" r="3" fill="white" />
+                    <circle cx="20" cy="40" r="3" fill="white" />
+                    <circle cx="80" cy="40" r="3" fill="white" />
+                    <circle cx="50" cy="70" r="3" fill="white" />
+                    <circle cx="30" cy="90" r="3" fill="white" />
+                    <circle cx="70" cy="90" r="3" fill="white" />
+                    <line
+                        x1="50"
+                        y1="10"
+                        x2="20"
+                        y2="40"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="10"
+                        x2="80"
+                        y2="40"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="20"
+                        y1="40"
+                        x2="80"
+                        y2="40"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="20"
+                        y1="40"
+                        x2="50"
+                        y2="70"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="80"
+                        y1="40"
+                        x2="50"
+                        y2="70"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="70"
+                        x2="30"
+                        y2="90"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="70"
+                        x2="70"
+                        y2="90"
+                        stroke="white"
+                        stroke-width="1"
+                    />
                 </svg>
-                Top 20 stories summarized
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
+                <svg
+                    class="floating-graph"
+                    width="180"
+                    height="180"
+                    viewBox="0 0 100 100"
+                    fill="none"
+                >
+                    <circle cx="30" cy="30" r="3" fill="white" />
+                    <circle cx="70" cy="30" r="3" fill="white" />
+                    <circle cx="50" cy="60" r="3" fill="white" />
+                    <circle cx="30" cy="80" r="3" fill="white" />
+                    <circle cx="70" cy="80" r="3" fill="white" />
+                    <line
+                        x1="30"
+                        y1="30"
+                        x2="70"
+                        y2="30"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="30"
+                        y1="30"
+                        x2="50"
+                        y2="60"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="70"
+                        y1="30"
+                        x2="50"
+                        y2="60"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="60"
+                        x2="30"
+                        y2="80"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="60"
+                        x2="70"
+                        y2="80"
+                        stroke="white"
+                        stroke-width="1"
+                    />
                 </svg>
-                Topic filtering
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
+                <svg
+                    class="floating-graph"
+                    width="160"
+                    height="160"
+                    viewBox="0 0 100 100"
+                    fill="none"
+                >
+                    <circle cx="50" cy="20" r="3" fill="white" />
+                    <circle cx="20" cy="50" r="3" fill="white" />
+                    <circle cx="80" cy="50" r="3" fill="white" />
+                    <circle cx="35" cy="75" r="3" fill="white" />
+                    <circle cx="65" cy="75" r="3" fill="white" />
+                    <line
+                        x1="50"
+                        y1="20"
+                        x2="20"
+                        y2="50"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="50"
+                        y1="20"
+                        x2="80"
+                        y2="50"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="20"
+                        y1="50"
+                        x2="35"
+                        y2="75"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="80"
+                        y1="50"
+                        x2="65"
+                        y2="75"
+                        stroke="white"
+                        stroke-width="1"
+                    />
+                    <line
+                        x1="35"
+                        y1="75"
+                        x2="65"
+                        y2="75"
+                        stroke="white"
+                        stroke-width="1"
+                    />
                 </svg>
-                Mobile optimized
-              </li>
-            </ul>
-            <a href="#cta" class="btn btn-pricing">Get Started</a>
-          </div>
-          <div class="pricing-card popular fade-up" style="transition-delay: 100ms;">
-            <span class="popular-badge">Most Popular</span>
-            <h3>Daily Briefing</h3>
-            <div class="price" id="daily-price">$7.99<span>/month</span></div>
-            <p class="description">Stay ahead with daily AI news curated specifically for your interests and schedule.</p>
-            <ul class="pricing-features">
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
+            </div>
+            <div class="hero-content">
+                <img
+                    src="imgs/logo.svg"
+                    alt="Steward Logo"
+                    class="hero-logo"
+                    width="80"
+                    height="80"
+                />
+                <h1 class="fade-up">Your AI-Curated News Briefing</h1>
+                <p
+                    class="hero-subtitle fade-up"
+                    style="transition-delay: 100ms"
+                >
+                    Save hours. Stay informed. Get the most relevant AI news
+                    delivered daily or weekly.
+                </p>
+                <div class="hero-ctas fade-up" style="transition-delay: 200ms">
+                    <a href="#pricing" class="btn btn-primary">Subscribe Now</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+                <div
+                    class="trust-badges fade-up"
+                    style="transition-delay: 300ms"
+                >
+                    <div class="trust-badge">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                            />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>50,000+ subscribers</span>
+                    </div>
+                    <div class="trust-badge">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span>3+ hours saved weekly</span>
+                    </div>
+                </div>
+            </div>
+            <a
+                href="#features"
+                class="scroll-indicator"
+                aria-label="Scroll to features"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
                 </svg>
-                Daily briefings (5x/week)
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                Unlimited story access
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                Advanced AI filtering
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                Priority support
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                Archive access
-              </li>
-            </ul>
-            <a href="#cta" class="btn btn-pricing">Get Started</a>
-          </div>
+            </a>
+        </header>
+
+        <main id="main">
+            <!-- Features Section -->
+            <section id="features" class="features">
+                <div class="container">
+                    <div class="section-header fade-up">
+                        <span class="section-label">Features</span>
+                        <h2 class="section-title">
+                            Everything you need to stay informed
+                        </h2>
+                        <p class="section-subtitle">
+                            Our AI system does the heavy lifting so you can
+                            focus on what matters.
+                        </p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card fade-up">
+                            <div class="feature-icon">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"
+                                    />
+                                    <path d="M12 6v6l4 2" />
+                                </svg>
+                            </div>
+                            <h3>Smart Curation</h3>
+                            <p>
+                                AI analyzes thousands of sources to surface only
+                                what matters to you, learning from your feedback
+                                continuously.
+                            </p>
+                        </div>
+                        <div
+                            class="feature-card fade-up"
+                            style="transition-delay: 100ms"
+                        >
+                            <div class="feature-icon">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                            <h3>Time Saving</h3>
+                            <p>
+                                One briefing instead of 3 hours of scrolling.
+                                Every morning, delivered to your inbox at your
+                                preferred time.
+                            </p>
+                        </div>
+                        <div
+                            class="feature-card fade-up"
+                            style="transition-delay: 200ms"
+                        >
+                            <div class="feature-icon">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                                    />
+                                </svg>
+                            </div>
+                            <h3>Fully Configurable</h3>
+                            <p>
+                                Daily or weekly. Deep dive or quick scan. Choose
+                                your topics, frequency, and preferred time.
+                                You're in control.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="how-it-works">
+                <div class="container">
+                    <div class="section-header fade-up">
+                        <span class="section-label">How It Works</span>
+                        <h2 class="section-title">
+                            Three steps to stay informed
+                        </h2>
+                        <p class="section-subtitle">
+                            Getting started takes less than 2 minutes.
+                        </p>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-step fade-up">
+                            <div class="step-number">1</div>
+                            <svg
+                                class="step-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path d="M12 20h9" />
+                                <path
+                                    d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                                />
+                            </svg>
+                            <h3>Choose Your Preferences</h3>
+                            <p>
+                                Select your topics, preferred frequency, and
+                                delivery time that fits your schedule.
+                            </p>
+                        </div>
+                        <div
+                            class="timeline-step fade-up"
+                            style="transition-delay: 100ms"
+                        >
+                            <div class="step-number">2</div>
+                            <svg
+                                class="step-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                                />
+                                <polyline
+                                    points="3.27 6.96 12 12.01 20.73 6.96"
+                                />
+                                <line x1="12" y1="22.08" x2="12" y2="12" />
+                            </svg>
+                            <h3>AI Curates</h3>
+                            <p>
+                                Our system learns your interests and scours
+                                thousands of sources to find the most relevant
+                                news.
+                            </p>
+                        </div>
+                        <div
+                            class="timeline-step fade-up"
+                            style="transition-delay: 200ms"
+                        >
+                            <div class="step-number">3</div>
+                            <svg
+                                class="step-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                                />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            <h3>Receive Daily</h3>
+                            <p>
+                                Get your personalized briefing delivered to your
+                                inbox. Short summaries, no fluff, just the news
+                                that matters.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing Section -->
+            <section id="pricing" class="pricing">
+                <div class="container">
+                    <div class="section-header fade-up">
+                        <span class="section-label">Pricing</span>
+                        <h2 class="section-title">
+                            Simple, transparent pricing
+                        </h2>
+                        <p class="section-subtitle">
+                            Try it free for a week, upgrade when you're
+                            ready.<br />Select a daily or weekly cadence
+                            acording to your needs.
+                        </p>
+                    </div>
+                    <div class="pricing-toggle fade-up">
+                        <span class="active" id="weekly-label">Montly</span>
+                        <div
+                            class="toggle-switch"
+                            id="billing-toggle"
+                            role="switch"
+                            aria-checked="false"
+                            tabindex="0"
+                            aria-label="Toggle billing period"
+                        ></div>
+                        <span class="" id="monthly-label">Yearly</span>
+                    </div>
+                    <div class="pricing-cards">
+                        <div class="pricing-card fade-up">
+                            <h3>Weekly Digest</h3>
+                            <div class="price" id="weekly-price">
+                                $4.99<span>/month</span>
+                            </div>
+                            <p class="description">
+                                Perfect for staying current with a weekly
+                                roundup of the most important AI developments.
+                            </p>
+                            <ul class="pricing-features">
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    One weekly briefing
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Top 20 stories summarized
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Topic filtering
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Mobile optimized
+                                </li>
+                            </ul>
+                            <button
+                                onclick="selectPlan('weekly')"
+                                class="btn btn-pricing"
+                            >
+                                Get Started
+                            </button>
+                        </div>
+                        <div
+                            class="pricing-card popular fade-up"
+                            style="transition-delay: 100ms"
+                        >
+                            <span class="popular-badge">Most Popular</span>
+                            <h3>Daily Briefing</h3>
+                            <div class="price" id="daily-price">
+                                $7.99<span>/month</span>
+                            </div>
+                            <p class="description">
+                                Stay ahead with daily AI news curated
+                                specifically for your interests and schedule.
+                            </p>
+                            <ul class="pricing-features">
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Daily briefings (5x/week)
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Unlimited story access
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Advanced AI filtering
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Priority support
+                                </li>
+                                <li>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Archive access
+                                </li>
+                            </ul>
+                            <button
+                                onclick="selectPlan('daily')"
+                                class="btn btn-pricing"
+                            >
+                                Get Started
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="testimonials">
+                <div class="container">
+                    <div class="section-header fade-up">
+                        <span class="section-label">Testimonials</span>
+                        <h2 class="section-title">
+                            Trusted by industry professionals
+                        </h2>
+                        <p class="section-subtitle">
+                            Join thousands who start their day with Steward.
+                        </p>
+                    </div>
+                    <div class="testimonials-grid">
+                        <div class="testimonial-card fade-up">
+                            <div class="stars">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                            </div>
+                            <blockquote>
+                                Steward saves me 4 hours every week. The AI
+                                somehow knows exactly what I need to read
+                                without me having to search for it.
+                            </blockquote>
+                            <div class="testimonial-author">
+                                <div
+                                    class="author-avatar"
+                                    role="img"
+                                    aria-label="Sarah Chen"
+                                ></div>
+                                <div class="author-info">
+                                    <h4>Sarah Chen</h4>
+                                    <p>Product Manager, Stripe</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="testimonial-card fade-up"
+                            style="transition-delay: 100ms"
+                        >
+                            <div class="stars">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                            </div>
+                            <blockquote>
+                                Finally a news source that doesn't waste my
+                                time. The summaries are perfectly detailed - I
+                                get the full picture without the fluff.
+                            </blockquote>
+                            <div class="testimonial-author">
+                                <div
+                                    class="author-avatar"
+                                    role="img"
+                                    aria-label="Marcus Johnson"
+                                ></div>
+                                <div class="author-info">
+                                    <h4>Marcus Johnson</h4>
+                                    <p>ML Engineer, Anthropic</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="testimonial-card fade-up"
+                            style="transition-delay: 200ms"
+                        >
+                            <div class="stars">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                    />
+                                </svg>
+                            </div>
+                            <blockquote>
+                                I start every morning with Steward. It's become
+                                essential to my workflow - I can't imagine going
+                                back to scrolling through feeds.
+                            </blockquote>
+                            <div class="testimonial-author">
+                                <div
+                                    class="author-avatar"
+                                    role="img"
+                                    aria-label="Emily Rodriguez"
+                                ></div>
+                                <div class="author-info">
+                                    <h4>Emily Rodriguez</h4>
+                                    <p>Founder, TechStart Labs</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Final CTA Section -->
+            <section id="cta" class="final-cta">
+                <div class="final-cta-content">
+                    <h2 class="fade-up">Ready to reclaim your time?</h2>
+                    <p class="fade-up" style="transition-delay: 100ms">
+                        Join 50,000+ subscribers who start their day smarter.
+                    </p>
+
+                    <form
+                        class="cta-form fade-up"
+                        style="transition-delay: 200ms"
+                        id="checkout-form"
+                    >
+                        <div class="cta-form-container">
+                            <input
+                                type="email"
+                                id="email-input"
+                                placeholder="Enter your email"
+                                aria-label="Email address"
+                                required
+                            />
+
+                            <!-- Stripe Card Element -->
+                            <div id="card-element">
+                                <!-- A Stripe Element will be inserted here. -->
+                            </div>
+
+                            <!-- Error messages -->
+                            <div id="error-messages" class="form-message"></div>
+
+                            <!-- Success messages -->
+                            <div
+                                id="success-messages"
+                                class="form-message"
+                            ></div>
+
+                            <button
+                                type="submit"
+                                id="submit-button"
+                                class="btn btn-primary"
+                                style="width: 100%"
+                            >
+                                Subscribe
+                            </button>
+                        </div>
+                    </form>
+
+                    <p
+                        class="privacy-text fade-up"
+                        style="transition-delay: 300ms; margin-top: 24px"
+                    >
+                        We respect your privacy. Unsubscribe anytime.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <img
+                            src="imgs/logo.svg"
+                            alt="Steward"
+                            width="40"
+                            height="40"
+                        />
+                        <span>Steward</span>
+                    </div>
+                    <nav class="footer-nav" aria-label="Footer navigation">
+                        <a href="#features">Features</a>
+                        <a href="#pricing">Pricing</a>
+                        <a href="#about">About</a>
+                        <a href="https://medium.com/@AISteward">Blog</a>
+                        <a href="#">Privacy</a>
+                        <a href="#">Terms</a>
+                    </nav>
+                    <div class="social-links">
+                        <a href="https://x.com/AISteward" aria-label="Twitter">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                                />
+                            </svg>
+                        </a>
+                        <a
+                            href="https://linkedin.com/in/AISteward"
+                            aria-label="LinkedIn"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+                                />
+                                <rect x="2" y="9" width="4" height="12" />
+                                <circle cx="4" cy="4" r="2" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>2026 Steward. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Stripe Integration Scripts -->
+        <script src="src/js/stripe/config.js"></script>
+        <script src="src/js/stripe/stripeClient.js"></script>
+        <script src="src/js/stripe/paymentHandler.js"></script>
+        <script src="src/js/stripe/formHandler.js"></script>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-icon">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    >
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h3 class="modal-title">Success!</h3>
+                <p id="modal-message" class="modal-text"></p>
+                <button
+                    id="close-modal"
+                    class="btn btn-primary btn-modal-close"
+                >
+                    Great, thanks!
+                </button>
+            </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials">
-      <div class="container">
-        <div class="section-header fade-up">
-          <span class="section-label">Testimonials</span>
-          <h2 class="section-title">Trusted by industry professionals</h2>
-          <p class="section-subtitle">Join thousands who start their day with Steward.</p>
-        </div>
-        <div class="testimonials-grid">
-          <div class="testimonial-card fade-up">
-            <div class="stars">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <blockquote>Steward saves me 4 hours every week. The AI somehow knows exactly what I need to read without me having to search for it.</blockquote>
-            <div class="testimonial-author">
-              <div class="author-avatar" role="img" aria-label="Sarah Chen"></div>
-              <div class="author-info">
-                <h4>Sarah Chen</h4>
-                <p>Product Manager, Stripe</p>
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-card fade-up" style="transition-delay: 100ms;">
-            <div class="stars">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <blockquote>Finally a news source that doesn't waste my time. The summaries are perfectly detailed - I get the full picture without the fluff.</blockquote>
-            <div class="testimonial-author">
-              <div class="author-avatar" role="img" aria-label="Marcus Johnson"></div>
-              <div class="author-info">
-                <h4>Marcus Johnson</h4>
-                <p>ML Engineer, Anthropic</p>
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-card fade-up" style="transition-delay: 200ms;">
-            <div class="stars">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <blockquote>I start every morning with Steward. It's become essential to my workflow - I can't imagine going back to scrolling through feeds.</blockquote>
-            <div class="testimonial-author">
-              <div class="author-avatar" role="img" aria-label="Emily Rodriguez"></div>
-              <div class="author-info">
-                <h4>Emily Rodriguez</h4>
-                <p>Founder, TechStart Labs</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        <script>
+            // Initialize Stripe Integration
+            document.addEventListener("DOMContentLoaded", async () => {
+                const successModal = document.getElementById("success-modal");
+                const closeModalBtn = document.getElementById("close-modal");
+                const modalMessage = document.getElementById("modal-message");
 
-    <!-- Final CTA Section -->
-    <section id="cta" class="final-cta">
-      <div class="final-cta-content">
-        <h2 class="fade-up">Ready to reclaim your time?</h2>
-        <p class="fade-up" style="transition-delay: 100ms;">Join 50,000+ subscribers who start their day smarter.</p>
-        <form class="cta-form fade-up" style="transition-delay: 200ms;" action="#" method="post">
-          <input type="email" placeholder="Enter your email" aria-label="Email address" required>
-          <button type="submit" class="btn btn-primary">Subscribe</button>
-        </form>
-        <p class="privacy-text fade-up" style="transition-delay: 300ms;">We respect your privacy. Unsubscribe anytime.</p>
-      </div>
-    </section>
-  </main>
+                window.addEventListener("signupSuccess", (event) => {
+                    const email = event.detail.email;
+                    modalMessage.innerHTML = `Welcome! Your subscription is active. Check your email for next steps.<br><br><small>Confirmation sent to <strong>${email}</strong></small>`;
+                    successModal.classList.add("active");
+                });
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-logo">
-          <img src="imgs/logo.svg" alt="Steward" width="40" height="40">
-          <span>Steward</span>
-        </div>
-        <nav class="footer-nav" aria-label="Footer navigation">
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#about">About</a>
-          <a href="https://medium.com/@AISteward">Blog</a>
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-        </nav>
-        <div class="social-links">
-          <a href="https://x.com/AISteward" aria-label="Twitter">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-            </svg>
-          </a>
-          <a href="https://linkedin.com/in/AISteward" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-              <rect x="2" y="9" width="4" height="12"/>
-              <circle cx="4" cy="4" r="2"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>2026 Steward. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+                closeModalBtn.addEventListener("click", () => {
+                    successModal.classList.remove("active");
+                    // Cleanup the form after modal is closed
+                    if (window.stewardFormHandler) {
+                        window.stewardFormHandler.reset();
+                    }
+                });
 
-  <script>
-    // Intersection Observer for scroll animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+                try {
+                    // Use production key for production environment
+                    // For production, replace 'pk_test_...' in config.js with your live key
+                    const publishableKey = window.StripeConfig
+                        ? window.StripeConfig.publishableKey
+                        : "pk_test_51TPn8BCedfJbvsUYWmp560FZsoKAmr5T0aUXy2UJaO4883rATyB5zfOvtz7mKO8cyjD6vdtixHBI17zL8fbkX6pM00v9HXuHOG";
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, observerOptions);
+                    const stripeClient = new StripeClient(publishableKey);
+                    await stripeClient.init();
+                    stripeClient.mountCardElement("card-element");
 
-    document.querySelectorAll('.fade-up').forEach(el => {
-      observer.observe(el);
-    });
+                    const paymentHandler = new PaymentHandler(stripeClient);
+                    const formHandler = new FormHandler(paymentHandler);
 
-    // Pricing toggle
-    const toggle = document.getElementById('billing-toggle');
-    const monthlyLabel = document.getElementById('weekly-label');
-    const yearlyLabel = document.getElementById('monthly-label');
-    const weeklyPrice = document.getElementById('weekly-price');
-    const dailyPrice = document.getElementById('daily-price');
+                    formHandler.init({
+                        formSelector: "#checkout-form",
+                        emailSelector: "#email-input",
+                        submitSelector: "#submit-button",
+                        errorSelector: "#error-messages",
+                        successSelector: "#success-messages",
+                    });
 
-    let isMonthly = true;
+                    // Expose globally for pricing buttons
+                    window.stewardFormHandler = formHandler;
 
-    function updatePricing() {
-      if (isMonthly) {
-        weeklyPrice.innerHTML = '$4.99<span>/month</span>';
-        dailyPrice.innerHTML = '$7.99<span>/month</span>';
-        monthlyLabel.classList.add('active');
-        yearlyLabel.classList.remove('active');
-        toggle.classList.remove('active');
-        toggle.setAttribute('aria-checked', 'true');
-      } else {
-        weeklyPrice.innerHTML = '$49.99<span>/year</span>';
-        dailyPrice.innerHTML = '$79.99<span>/year</span>';
-        yearlyLabel.classList.add('active');
-        monthlyLabel.classList.remove('active');
-        toggle.classList.add('active');
-        toggle.setAttribute('aria-checked', 'false');
-      }
-    }
-
-    toggle.addEventListener('click', () => {
-      isMonthly = !isMonthly;
-      updatePricing();
-    });
-
-    toggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        isMonthly = !isMonthly;
-        updatePricing();
-      }
-    });
-
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href !== '#') {
-          e.preventDefault();
-          const target = document.querySelector(href);
-          if (target) {
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
+                    // Default plan
+                    formHandler.selectPlan("daily");
+                    formHandler.setBillingPeriod("monthly");
+                } catch (error) {
+                    console.error(
+                        "Failed to initialize Stripe integration:",
+                        error,
+                    );
+                }
             });
-          }
-        }
-      });
-    });
-  </script>
 
-<script>
+            // Helper to select plan from pricing cards
+            window.selectPlan = (planId) => {
+                if (window.stewardFormHandler) {
+                    window.stewardFormHandler.selectPlan(planId);
 
-(function () {
-  "use strict";
+                    // Scroll to form
+                    const ctaSection = document.getElementById("cta");
+                    if (ctaSection) {
+                        ctaSection.scrollIntoView({ behavior: "smooth" });
+                    }
 
-  // 检查是否在 iframe 中
-  if (window.self === window.top) {
-    return; // 不在 iframe 中，不执行
-  }
+                    // Highlight selection (optional)
+                    console.log(`Plan selected: ${planId}`);
+                }
+            };
 
-  // 检查是否已经初始化过
-  if (window.__iframeHighlightInitialized) {
-    return;
-  }
-  window.__iframeHighlightInitialized = true;
-  console.log("Iframe 高亮脚本已加载");
+            // Intersection Observer for scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px",
+            };
 
-  // 创建高亮覆盖层
-  var overlay = document.createElement("div");
-  overlay.id = "iframe-highlight-overlay";
-  overlay.style.cssText = "\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100vw;\n    height: 100vh;\n    pointer-events: none;\n    z-index: 999999;\n    overflow: hidden;\n  ";
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                    }
+                });
+            }, observerOptions);
 
-  // 创建悬停高亮框（虚线边框）
-  var highlightBox = document.createElement("div");
-  highlightBox.id = "iframe-highlight-box";
-  highlightBox.style.cssText = "\n    position: absolute;\n    border: 2px dashed #007AFF;\n    background: rgba(0, 122, 255, 0.08);\n    pointer-events: none;\n    display: none;\n    transition: all 0.1s ease;\n    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);\n    border-radius: 2px;\n  ";
+            document.querySelectorAll(".fade-up").forEach((el) => {
+                observer.observe(el);
+            });
 
-  // 创建选中节点的常驻高亮框（实线边框）
-  var selectedBox = document.createElement("div");
-  selectedBox.id = "iframe-selected-box";
-  selectedBox.style.cssText = "\n    position: absolute;\n    border: 2px solid #007AFF;\n    pointer-events: none;\n    display: none;\n    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 107, 53, 0.4);\n    border-radius: 2px;\n    z-index: 1000000;\n  ";
+            // Pricing toggle
+            const toggle = document.getElementById("billing-toggle");
+            const monthlyLabel = document.getElementById("weekly-label");
+            const yearlyLabel = document.getElementById("monthly-label");
+            const weeklyPrice = document.getElementById("weekly-price");
+            const dailyPrice = document.getElementById("daily-price");
 
-  // 创建悬停标签显示
-  var tagLabel = document.createElement("div");
-  tagLabel.id = "iframe-tag-label";
-  tagLabel.style.cssText = "\n    position: absolute;\n    background: #007AFF;\n    color: white;\n    padding: 2px 6px;\n    font-size: 11px;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n    border-radius: 2px;\n    pointer-events: none;\n    display: none;\n    white-space: nowrap;\n    z-index: 1000001;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);\n    font-weight: 500;\n  ";
+            let isMonthly = true;
 
-  // 创建选中节点标签
-  var selectedLabel = document.createElement("div");
-  selectedLabel.id = "iframe-selected-label";
-  selectedLabel.style.cssText = "\n    position: absolute;\n    background: #007AFF;\n    color: white;\n    padding: 3px 8px;\n    font-size: 11px;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n    border-radius: 3px;\n    pointer-events: none;\n    display: none;\n    white-space: nowrap;\n    z-index: 1000002;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n    font-weight: 600;\n  ";
-  overlay.appendChild(highlightBox);
-  overlay.appendChild(selectedBox);
-  overlay.appendChild(tagLabel);
-  overlay.appendChild(selectedLabel);
-  document.body.appendChild(overlay);
+            function updatePricing() {
+                const period = isMonthly ? "monthly" : "yearly";
 
-  // 存储当前选中的元素
-  var selectedElement = null;
-  var highlightEnabled = false;
+                if (isMonthly) {
+                    weeklyPrice.innerHTML = "$4.99<span>/month</span>";
+                    dailyPrice.innerHTML = "$7.99<span>/month</span>";
+                    monthlyLabel.classList.add("active");
+                    yearlyLabel.classList.remove("active");
+                    toggle.classList.remove("active");
+                    toggle.setAttribute("aria-checked", "true");
+                } else {
+                    weeklyPrice.innerHTML = "$49.99<span>/year</span>";
+                    dailyPrice.innerHTML = "$79.99<span>/year</span>";
+                    yearlyLabel.classList.add("active");
+                    monthlyLabel.classList.remove("active");
+                    toggle.classList.add("active");
+                    toggle.setAttribute("aria-checked", "false");
+                }
 
-  // 更新选中元素的高亮显示
-  function updateSelectedHighlight(element) {
-    console.log("updateSelectedHighlight called with:", element);
-    if (!element) {
-      selectedBox.style.display = "none";
-      selectedLabel.style.display = "none";
-      selectedElement = null;
-      console.log("Cleared selected highlight");
-      return;
-    }
-    selectedElement = element;
-    var rect = element.getBoundingClientRect();
-    console.log("Selected element rect:", rect);
+                // Sync with formHandler
+                if (window.stewardFormHandler) {
+                    window.stewardFormHandler.setBillingPeriod(period);
+                }
+            }
 
-    // 更新选中高亮框位置
-    selectedBox.style.display = "block";
-    selectedBox.style.left = "".concat(rect.left - 2, "px");
-    selectedBox.style.top = "".concat(rect.top - 2, "px");
-    selectedBox.style.width = "".concat(rect.width + 4, "px");
-    selectedBox.style.height = "".concat(rect.height + 4, "px");
+            toggle.addEventListener("click", () => {
+                isMonthly = !isMonthly;
+                updatePricing();
+            });
 
-    // 更新选中标签位置和内容
-    selectedLabel.style.display = "block";
-    selectedLabel.textContent = "\u2713 <".concat(element.tagName.toLowerCase(), ">");
+            toggle.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    isMonthly = !isMonthly;
+                    updatePricing();
+                }
+            });
 
-    // 计算标签位置，确保不超出视窗
-    var labelTop = rect.top - 28;
-    var labelLeft = rect.left;
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    const href = this.getAttribute("href");
+                    if (href !== "#") {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                            });
+                        }
+                    }
+                });
+            });
+        </script>
 
-    // 如果标签会超出顶部，显示在元素下方
-    if (labelTop < 5) {
-      labelTop = rect.bottom + 5;
-    }
+        <script>
+            (function () {
+                "use strict";
 
-    // 如果标签会超出右侧，向左调整
-    var labelWidth = selectedLabel.offsetWidth || 100; // 预估宽度
-    if (labelLeft + labelWidth > window.innerWidth - 10) {
-      labelLeft = window.innerWidth - labelWidth - 10;
-    }
-    selectedLabel.style.left = "".concat(Math.max(5, labelLeft), "px");
-    selectedLabel.style.top = "".concat(labelTop, "px");
-    console.log("Selected highlight positioned at:", {
-      left: selectedBox.style.left,
-      top: selectedBox.style.top,
-      width: selectedBox.style.width,
-      height: selectedBox.style.height
-    });
-  }
-  function getElementSelector(element) {
-    if (!(element instanceof Element)) throw new Error('Argument must be a DOM element');
-    var segments = [];
-    var current = element;
-    while (current !== document.documentElement) {
-      var selector = '';
-      // 优先检查唯一ID
-      if (current.id && document.querySelectorAll("#".concat(current.id)).length === 1) {
-        segments.unshift("#".concat(current.id));
-        break; // ID唯一，无需继续向上
-      }
+                // 检查是否在 iframe 中
+                if (window.self === window.top) {
+                    return; // 不在 iframe 中，不执行
+                }
 
-      // 生成类名选择器（取第一个有效类名）
-      var classes = Array.from(current.classList).filter(function (c) {
-        return !c.startsWith('js-');
-      });
-      var className = classes.length > 0 ? ".".concat(classes[0]) : '';
+                // 检查是否已经初始化过
+                if (window.__iframeHighlightInitialized) {
+                    return;
+                }
+                window.__iframeHighlightInitialized = true;
+                console.log("Iframe 高亮脚本已加载");
 
-      // 生成位置索引（nth-child）
-      var tag = current.tagName.toLowerCase();
-      if (!className) {
-        var siblings = Array.from(current.parentNode.children);
-        var index = siblings.findIndex(function (el) {
-          return el === current;
-        }) + 1;
-        selector = "".concat(tag, ":nth-child(").concat(index, ")");
-      } else {
-        selector = className;
-      }
-      segments.unshift(selector);
-      current = current.parentElement;
-    }
+                // 创建高亮覆盖层
+                var overlay = document.createElement("div");
+                overlay.id = "iframe-highlight-overlay";
+                overlay.style.cssText =
+                    "\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100vw;\n    height: 100vh;\n    pointer-events: none;\n    z-index: 999999;\n    overflow: hidden;\n  ";
 
-    // 处理根元素
-    if (current === document.documentElement) {
-      segments.unshift('html');
-    }
-    return segments.join(' > ');
-  }
+                // 创建悬停高亮框（虚线边框）
+                var highlightBox = document.createElement("div");
+                highlightBox.id = "iframe-highlight-box";
+                highlightBox.style.cssText =
+                    "\n    position: absolute;\n    border: 2px dashed #007AFF;\n    background: rgba(0, 122, 255, 0.08);\n    pointer-events: none;\n    display: none;\n    transition: all 0.1s ease;\n    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);\n    border-radius: 2px;\n  ";
 
-  // 获取元素文本内容
-  function getElementText(element) {
-    var _element$textContent;
-    if (element.tagName === "INPUT") {
-      return element.value || element.placeholder || "";
-    }
-    if (element.tagName === "TEXTAREA") {
-      return element.value || element.placeholder || "";
-    }
-    var text = ((_element$textContent = element.textContent) === null || _element$textContent === void 0 ? void 0 : _element$textContent.trim()) || "";
-    return text.length > 50 ? text.substring(0, 50) + "..." : text;
-  }
+                // 创建选中节点的常驻高亮框（实线边框）
+                var selectedBox = document.createElement("div");
+                selectedBox.id = "iframe-selected-box";
+                selectedBox.style.cssText =
+                    "\n    position: absolute;\n    border: 2px solid #007AFF;\n    pointer-events: none;\n    display: none;\n    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 107, 53, 0.4);\n    border-radius: 2px;\n    z-index: 1000000;\n  ";
 
-  // 获取元素属性信息
-  function getElementAttributes(element) {
-    var attrs = {};
-    for (var i = 0; i < element.attributes.length; i++) {
-      var attr = element.attributes[i];
-      attrs[attr.name] = attr.value;
-    }
-    return attrs;
-  }
+                // 创建悬停标签显示
+                var tagLabel = document.createElement("div");
+                tagLabel.id = "iframe-tag-label";
+                tagLabel.style.cssText =
+                    "\n    position: absolute;\n    background: #007AFF;\n    color: white;\n    padding: 2px 6px;\n    font-size: 11px;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n    border-radius: 2px;\n    pointer-events: none;\n    display: none;\n    white-space: nowrap;\n    z-index: 1000001;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);\n    font-weight: 500;\n  ";
 
-  // 鼠标悬停事件处理
-  function handleMouseOver(e) {
-    if (!highlightEnabled) return;
-    var target = e.target;
-    if (!target || target === overlay || target === highlightBox || target === tagLabel || target === selectedBox || target === selectedLabel) {
-      return;
-    }
+                // 创建选中节点标签
+                var selectedLabel = document.createElement("div");
+                selectedLabel.id = "iframe-selected-label";
+                selectedLabel.style.cssText =
+                    "\n    position: absolute;\n    background: #007AFF;\n    color: white;\n    padding: 3px 8px;\n    font-size: 11px;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n    border-radius: 3px;\n    pointer-events: none;\n    display: none;\n    white-space: nowrap;\n    z-index: 1000002;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);\n    font-weight: 600;\n  ";
+                overlay.appendChild(highlightBox);
+                overlay.appendChild(selectedBox);
+                overlay.appendChild(tagLabel);
+                overlay.appendChild(selectedLabel);
+                document.body.appendChild(overlay);
 
-    // 避免高亮 html 和 body 元素
-    if (target === document.documentElement || target === document.body) {
-      return;
-    }
+                // 存储当前选中的元素
+                var selectedElement = null;
+                var highlightEnabled = false;
 
-    // 如果是已选中的元素，不显示悬停高亮
-    if (target === selectedElement) {
-      highlightBox.style.display = "none";
-      tagLabel.style.display = "none";
-      return;
-    }
-    var rect = target.getBoundingClientRect();
-    var selector = getElementSelector(target);
-    var text = getElementText(target);
-    var attributes = getElementAttributes(target);
+                // 更新选中元素的高亮显示
+                function updateSelectedHighlight(element) {
+                    console.log(
+                        "updateSelectedHighlight called with:",
+                        element,
+                    );
+                    if (!element) {
+                        selectedBox.style.display = "none";
+                        selectedLabel.style.display = "none";
+                        selectedElement = null;
+                        console.log("Cleared selected highlight");
+                        return;
+                    }
+                    selectedElement = element;
+                    var rect = element.getBoundingClientRect();
+                    console.log("Selected element rect:", rect);
 
-    // 更新悬停高亮框位置
-    highlightBox.style.display = "block";
-    highlightBox.style.left = "".concat(rect.left - 2, "px");
-    highlightBox.style.top = "".concat(rect.top - 2, "px");
-    highlightBox.style.width = "".concat(rect.width + 4, "px");
-    highlightBox.style.height = "".concat(rect.height + 4, "px");
+                    // 更新选中高亮框位置
+                    selectedBox.style.display = "block";
+                    selectedBox.style.left = "".concat(rect.left - 2, "px");
+                    selectedBox.style.top = "".concat(rect.top - 2, "px");
+                    selectedBox.style.width = "".concat(rect.width + 4, "px");
+                    selectedBox.style.height = "".concat(rect.height + 4, "px");
 
-    // 更新标签位置和内容
-    tagLabel.style.display = "block";
-    tagLabel.textContent = "<".concat(target.tagName.toLowerCase(), ">");
+                    // 更新选中标签位置和内容
+                    selectedLabel.style.display = "block";
+                    selectedLabel.textContent = "\u2713 <".concat(
+                        element.tagName.toLowerCase(),
+                        ">",
+                    );
 
-    // 计算标签位置，确保不超出视窗
-    var labelTop = rect.top - 22;
-    var labelLeft = rect.left;
+                    // 计算标签位置，确保不超出视窗
+                    var labelTop = rect.top - 28;
+                    var labelLeft = rect.left;
 
-    // 如果标签会超出顶部，显示在元素下方
-    if (labelTop < 0) {
-      labelTop = rect.bottom + 5;
-    }
+                    // 如果标签会超出顶部，显示在元素下方
+                    if (labelTop < 5) {
+                        labelTop = rect.bottom + 5;
+                    }
 
-    // 如果标签会超出右侧，向左调整
-    if (labelLeft + tagLabel.offsetWidth > window.innerWidth) {
-      labelLeft = window.innerWidth - tagLabel.offsetWidth - 5;
-    }
-    tagLabel.style.left = "".concat(Math.max(0, labelLeft), "px");
-    tagLabel.style.top = "".concat(labelTop, "px");
+                    // 如果标签会超出右侧，向左调整
+                    var labelWidth = selectedLabel.offsetWidth || 100; // 预估宽度
+                    if (labelLeft + labelWidth > window.innerWidth - 10) {
+                        labelLeft = window.innerWidth - labelWidth - 10;
+                    }
+                    selectedLabel.style.left = "".concat(
+                        Math.max(5, labelLeft),
+                        "px",
+                    );
+                    selectedLabel.style.top = "".concat(labelTop, "px");
+                    console.log("Selected highlight positioned at:", {
+                        left: selectedBox.style.left,
+                        top: selectedBox.style.top,
+                        width: selectedBox.style.width,
+                        height: selectedBox.style.height,
+                    });
+                }
+                function getElementSelector(element) {
+                    if (!(element instanceof Element))
+                        throw new Error("Argument must be a DOM element");
+                    var segments = [];
+                    var current = element;
+                    while (current !== document.documentElement) {
+                        var selector = "";
+                        // 优先检查唯一ID
+                        if (
+                            current.id &&
+                            document.querySelectorAll("#".concat(current.id))
+                                .length === 1
+                        ) {
+                            segments.unshift("#".concat(current.id));
+                            break; // ID唯一，无需继续向上
+                        }
 
-    // 发送消息到父窗口
-    var elementInfo = {
-      tagName: target.tagName.toLowerCase(),
-      rect: {
-        left: rect.left,
-        top: rect.top,
-        right: rect.right,
-        bottom: rect.bottom,
-        width: rect.width,
-        height: rect.height,
-        x: rect.x,
-        y: rect.y
-      },
-      selector: selector,
-      text: text,
-      attributes: attributes,
-      url: window.location.href,
-      path: window.location.pathname,
-      timestamp: Date.now()
-    };
-    try {
-      window.parent.postMessage({
-        type: "iframe-element-hover",
-        data: elementInfo,
-        source: "iframe-highlight-injector"
-      }, "*");
-    } catch (error) {
-      console.warn("无法发送消息到父窗口:", error);
-    }
-  }
+                        // 生成类名选择器（取第一个有效类名）
+                        var classes = Array.from(current.classList).filter(
+                            function (c) {
+                                return !c.startsWith("js-");
+                            },
+                        );
+                        var className =
+                            classes.length > 0 ? ".".concat(classes[0]) : "";
 
-  // 鼠标离开事件处理
-  function handleMouseOut(e) {
-    if (!highlightEnabled) return;
-    var relatedTarget = e.relatedTarget;
+                        // 生成位置索引（nth-child）
+                        var tag = current.tagName.toLowerCase();
+                        if (!className) {
+                            var siblings = Array.from(
+                                current.parentNode.children,
+                            );
+                            var index =
+                                siblings.findIndex(function (el) {
+                                    return el === current;
+                                }) + 1;
+                            selector = ""
+                                .concat(tag, ":nth-child(")
+                                .concat(index, ")");
+                        } else {
+                            selector = className;
+                        }
+                        segments.unshift(selector);
+                        current = current.parentElement;
+                    }
 
-    // 如果鼠标移动到高亮相关元素上，不隐藏高亮
-    if (relatedTarget && (relatedTarget === highlightBox || relatedTarget === tagLabel || relatedTarget === overlay || relatedTarget === selectedBox || relatedTarget === selectedLabel)) {
-      return;
-    }
-    highlightBox.style.display = "none";
-    tagLabel.style.display = "none";
-    try {
-      window.parent.postMessage({
-        type: "iframe-element-hover",
-        data: null,
-        source: "iframe-highlight-injector"
-      }, "*");
-    } catch (error) {
-      console.warn("无法发送消息到父窗口:", error);
-    }
-  }
+                    // 处理根元素
+                    if (current === document.documentElement) {
+                        segments.unshift("html");
+                    }
+                    return segments.join(" > ");
+                }
 
-  // 点击事件处理
-  function handleClick(e) {
-    var target = e.target;
-    if (!target || target === overlay || target === highlightBox || target === tagLabel || target === selectedBox || target === selectedLabel) {
-      return;
-    }
+                // 获取元素文本内容
+                function getElementText(element) {
+                    var _element$textContent;
+                    if (element.tagName === "INPUT") {
+                        return element.value || element.placeholder || "";
+                    }
+                    if (element.tagName === "TEXTAREA") {
+                        return element.value || element.placeholder || "";
+                    }
+                    var text =
+                        ((_element$textContent = element.textContent) ===
+                            null || _element$textContent === void 0
+                            ? void 0
+                            : _element$textContent.trim()) || "";
+                    return text.length > 50
+                        ? text.substring(0, 50) + "..."
+                        : text;
+                }
 
-    // 避免处理 html 和 body 元素
-    if (target === document.documentElement || target === document.body) {
-      return;
-    }
+                // 获取元素属性信息
+                function getElementAttributes(element) {
+                    var attrs = {};
+                    for (var i = 0; i < element.attributes.length; i++) {
+                        var attr = element.attributes[i];
+                        attrs[attr.name] = attr.value;
+                    }
+                    return attrs;
+                }
 
-    // 检查是否是交互元素，这些元素需要保留默认行为
-    var isInteractiveElement = ['input', 'textarea', 'select', 'button', 'a'].includes(target.tagName.toLowerCase());
+                // 鼠标悬停事件处理
+                function handleMouseOver(e) {
+                    if (!highlightEnabled) return;
+                    var target = e.target;
+                    if (
+                        !target ||
+                        target === overlay ||
+                        target === highlightBox ||
+                        target === tagLabel ||
+                        target === selectedBox ||
+                        target === selectedLabel
+                    ) {
+                        return;
+                    }
 
-    // 如果高亮功能启用，对于非交互元素阻止默认行为和事件传播
-    if (highlightEnabled) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    var rect = target.getBoundingClientRect();
-    var selector = getElementSelector(target);
-    var text = getElementText(target);
-    var attributes = getElementAttributes(target);
-    console.log("Element clicked:", {
-      tagName: target.tagName,
-      selector: selector,
-      rect: rect
-    });
+                    // 避免高亮 html 和 body 元素
+                    if (
+                        target === document.documentElement ||
+                        target === document.body
+                    ) {
+                        return;
+                    }
 
-    // 立即更新选中高亮
-    updateSelectedHighlight(target);
+                    // 如果是已选中的元素，不显示悬停高亮
+                    if (target === selectedElement) {
+                        highlightBox.style.display = "none";
+                        tagLabel.style.display = "none";
+                        return;
+                    }
+                    var rect = target.getBoundingClientRect();
+                    var selector = getElementSelector(target);
+                    var text = getElementText(target);
+                    var attributes = getElementAttributes(target);
 
-    // 隐藏悬停高亮，因为现在是选中状态
-    highlightBox.style.display = "none";
-    tagLabel.style.display = "none";
-    var elementInfo = {
-      tagName: target.tagName.toLowerCase(),
-      rect: {
-        left: rect.left,
-        top: rect.top,
-        right: rect.right,
-        bottom: rect.bottom,
-        width: rect.width,
-        height: rect.height,
-        x: rect.x,
-        y: rect.y
-      },
-      selector: selector,
-      text: text,
-      attributes: attributes,
-      url: window.location.href,
-      path: window.location.pathname,
-      timestamp: Date.now()
-    };
-    try {
-      window.parent.postMessage({
-        type: "iframe-element-click",
-        data: elementInfo,
-        source: "iframe-highlight-injector"
-      }, "*");
-    } catch (error) {
-      console.warn("无法发送消息到父窗口:", error);
-    }
-  }
+                    // 更新悬停高亮框位置
+                    highlightBox.style.display = "block";
+                    highlightBox.style.left = "".concat(rect.left - 2, "px");
+                    highlightBox.style.top = "".concat(rect.top - 2, "px");
+                    highlightBox.style.width = "".concat(rect.width + 4, "px");
+                    highlightBox.style.height = "".concat(
+                        rect.height + 4,
+                        "px",
+                    );
 
-  // 监听来自父窗口的消息
-  function handleParentMessage(event) {
-    console.log("Received message from parent:", event.data);
-    if (event.data.type === "iframe-highlight-toggle") {
-      var enabled = event.data.enabled;
-      console.log("Highlight toggle:", enabled);
-      if (enabled) {
-        enableHighlight();
-      } else {
-        disableHighlight();
-      }
-    } else if (event.data.type === "enable-iframe-highlight") {
-      console.log("Enable iframe highlight");
-      enableHighlight();
-    } else if (event.data.type === "disable-iframe-highlight") {
-      console.log("Disable iframe highlight");
-      disableHighlight();
-    } else if (event.data.type === "toggle-iframe-highlight") {
-      var _enabled = event.data.enabled !== undefined ? event.data.enabled : !highlightEnabled;
-      console.log("Toggle iframe highlight to:", _enabled);
-      if (_enabled) {
-        enableHighlight();
-      } else {
-        disableHighlight();
-      }
-    } else if (event.data.type === "update-selected-element") {
-      var selector = event.data.selector;
-      console.log("Update selected element with selector:", selector);
-      if (selector) {
-        try {
-          var element = document.querySelector(selector);
-          console.log("Found element by selector:", element);
-          updateSelectedHighlight(element);
-        } catch (error) {
-          console.warn("Failed to select element:", error);
-          updateSelectedHighlight(null);
-        }
-      } else {
-        updateSelectedHighlight(null);
-      }
-    } else if (event.data.type === "clear-selected-element") {
-      console.log("Clear selected element");
-      updateSelectedHighlight(null);
-    }
-  }
+                    // 更新标签位置和内容
+                    tagLabel.style.display = "block";
+                    tagLabel.textContent = "<".concat(
+                        target.tagName.toLowerCase(),
+                        ">",
+                    );
 
-  // 启用高亮功能
-  function enableHighlight() {
-    console.log("Enabling highlight");
-    document.addEventListener("mouseover", handleMouseOver, true);
-    document.addEventListener("mouseout", handleMouseOut, true);
-    document.addEventListener("click", handleClick, true);
-    highlightEnabled = true;
-    overlay.style.display = "block";
-  }
+                    // 计算标签位置，确保不超出视窗
+                    var labelTop = rect.top - 22;
+                    var labelLeft = rect.left;
 
-  // 禁用高亮功能
-  function disableHighlight() {
-    console.log("Disabling highlight");
-    highlightEnabled = false;
-    // 保持事件监听器，但通过 highlightEnabled 变量控制行为
-    // 这样可以保留选中状态的显示
-    highlightBox.style.display = "none";
-    tagLabel.style.display = "none";
-    // 不隐藏 selectedBox 和 selectedLabel，保留选中状态
-  }
+                    // 如果标签会超出顶部，显示在元素下方
+                    if (labelTop < 0) {
+                        labelTop = rect.bottom + 5;
+                    }
 
-  // 完全禁用高亮功能（移除所有监听器）
-  function fullyDisableHighlight() {
-    console.log("Fully disabling highlight");
-    highlightEnabled = false;
-    document.removeEventListener("mouseover", handleMouseOver, true);
-    document.removeEventListener("mouseout", handleMouseOut, true);
-    document.removeEventListener("click", handleClick, true);
-    overlay.style.display = "none";
-    highlightBox.style.display = "none";
-    tagLabel.style.display = "none";
-    selectedBox.style.display = "none";
-    selectedLabel.style.display = "none";
-  }
+                    // 如果标签会超出右侧，向左调整
+                    if (labelLeft + tagLabel.offsetWidth > window.innerWidth) {
+                        labelLeft =
+                            window.innerWidth - tagLabel.offsetWidth - 5;
+                    }
+                    tagLabel.style.left = "".concat(
+                        Math.max(0, labelLeft),
+                        "px",
+                    );
+                    tagLabel.style.top = "".concat(labelTop, "px");
 
-  // 添加事件监听
-  enableHighlight();
-  window.addEventListener("message", handleParentMessage);
+                    // 发送消息到父窗口
+                    var elementInfo = {
+                        tagName: target.tagName.toLowerCase(),
+                        rect: {
+                            left: rect.left,
+                            top: rect.top,
+                            right: rect.right,
+                            bottom: rect.bottom,
+                            width: rect.width,
+                            height: rect.height,
+                            x: rect.x,
+                            y: rect.y,
+                        },
+                        selector: selector,
+                        text: text,
+                        attributes: attributes,
+                        url: window.location.href,
+                        path: window.location.pathname,
+                        timestamp: Date.now(),
+                    };
+                    try {
+                        window.parent.postMessage(
+                            {
+                                type: "iframe-element-hover",
+                                data: elementInfo,
+                                source: "iframe-highlight-injector",
+                            },
+                            "*",
+                        );
+                    } catch (error) {
+                        console.warn("无法发送消息到父窗口:", error);
+                    }
+                }
 
-  // 暴露全局函数供外部调用
-  window.__iframeHighlightControl = {
-    enable: enableHighlight,
-    disable: disableHighlight,
-    fullyDisable: fullyDisableHighlight,
-    isEnabled: function isEnabled() {
-      return highlightEnabled;
-    },
-    getSelectedElement: function getSelectedElement() {
-      return selectedElement;
-    },
-    updateSelected: updateSelectedHighlight,
-    // 通过消息发送开关控制
-    sendToggleMessage: function sendToggleMessage(enabled) {
-      window.parent.postMessage({
-        type: 'iframe-highlight-status',
-        enabled: enabled || highlightEnabled,
-        source: 'iframe-highlight-injector'
-      }, '*');
-    }
-  };
+                // 鼠标离开事件处理
+                function handleMouseOut(e) {
+                    if (!highlightEnabled) return;
+                    var relatedTarget = e.relatedTarget;
 
-  // 通知父窗口脚本已加载
-  try {
-    window.parent.postMessage({
-      type: "iframe-highlight-ready",
-      data: {
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: Date.now()
-      },
-      source: "iframe-highlight-injector"
-    }, "*");
-  } catch (error) {
-    console.warn("无法发送就绪消息到父窗口:", error);
-  }
+                    // 如果鼠标移动到高亮相关元素上，不隐藏高亮
+                    if (
+                        relatedTarget &&
+                        (relatedTarget === highlightBox ||
+                            relatedTarget === tagLabel ||
+                            relatedTarget === overlay ||
+                            relatedTarget === selectedBox ||
+                            relatedTarget === selectedLabel)
+                    ) {
+                        return;
+                    }
+                    highlightBox.style.display = "none";
+                    tagLabel.style.display = "none";
+                    try {
+                        window.parent.postMessage(
+                            {
+                                type: "iframe-element-hover",
+                                data: null,
+                                source: "iframe-highlight-injector",
+                            },
+                            "*",
+                        );
+                    } catch (error) {
+                        console.warn("无法发送消息到父窗口:", error);
+                    }
+                }
 
-  // 清理函数
-  window.__iframeHighlightCleanup = function () {
-    fullyDisableHighlight();
-    window.removeEventListener("message", handleParentMessage);
-    if (overlay.parentElement) {
-      overlay.parentElement.removeChild(overlay);
-    }
-    delete window.__iframeHighlightInitialized;
-    delete window.__iframeHighlightCleanup;
-  };
-})();
+                // 点击事件处理
+                function handleClick(e) {
+                    var target = e.target;
+                    if (
+                        !target ||
+                        target === overlay ||
+                        target === highlightBox ||
+                        target === tagLabel ||
+                        target === selectedBox ||
+                        target === selectedLabel
+                    ) {
+                        return;
+                    }
 
-</script>
-</body>
+                    // 避免处理 html 和 body 元素
+                    if (
+                        target === document.documentElement ||
+                        target === document.body
+                    ) {
+                        return;
+                    }
+
+                    // 检查是否是交互元素，这些元素需要保留默认行为
+                    var isInteractiveElement = [
+                        "input",
+                        "textarea",
+                        "select",
+                        "button",
+                        "a",
+                    ].includes(target.tagName.toLowerCase());
+
+                    // 如果高亮功能启用，对于非交互元素阻止默认行为和事件传播
+                    if (highlightEnabled) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    var rect = target.getBoundingClientRect();
+                    var selector = getElementSelector(target);
+                    var text = getElementText(target);
+                    var attributes = getElementAttributes(target);
+                    console.log("Element clicked:", {
+                        tagName: target.tagName,
+                        selector: selector,
+                        rect: rect,
+                    });
+
+                    // 立即更新选中高亮
+                    updateSelectedHighlight(target);
+
+                    // 隐藏悬停高亮，因为现在是选中状态
+                    highlightBox.style.display = "none";
+                    tagLabel.style.display = "none";
+                    var elementInfo = {
+                        tagName: target.tagName.toLowerCase(),
+                        rect: {
+                            left: rect.left,
+                            top: rect.top,
+                            right: rect.right,
+                            bottom: rect.bottom,
+                            width: rect.width,
+                            height: rect.height,
+                            x: rect.x,
+                            y: rect.y,
+                        },
+                        selector: selector,
+                        text: text,
+                        attributes: attributes,
+                        url: window.location.href,
+                        path: window.location.pathname,
+                        timestamp: Date.now(),
+                    };
+                    try {
+                        window.parent.postMessage(
+                            {
+                                type: "iframe-element-click",
+                                data: elementInfo,
+                                source: "iframe-highlight-injector",
+                            },
+                            "*",
+                        );
+                    } catch (error) {
+                        console.warn("无法发送消息到父窗口:", error);
+                    }
+                }
+
+                // 监听来自父窗口的消息
+                function handleParentMessage(event) {
+                    console.log("Received message from parent:", event.data);
+                    if (event.data.type === "iframe-highlight-toggle") {
+                        var enabled = event.data.enabled;
+                        console.log("Highlight toggle:", enabled);
+                        if (enabled) {
+                            enableHighlight();
+                        } else {
+                            disableHighlight();
+                        }
+                    } else if (event.data.type === "enable-iframe-highlight") {
+                        console.log("Enable iframe highlight");
+                        enableHighlight();
+                    } else if (event.data.type === "disable-iframe-highlight") {
+                        console.log("Disable iframe highlight");
+                        disableHighlight();
+                    } else if (event.data.type === "toggle-iframe-highlight") {
+                        var _enabled =
+                            event.data.enabled !== undefined
+                                ? event.data.enabled
+                                : !highlightEnabled;
+                        console.log("Toggle iframe highlight to:", _enabled);
+                        if (_enabled) {
+                            enableHighlight();
+                        } else {
+                            disableHighlight();
+                        }
+                    } else if (event.data.type === "update-selected-element") {
+                        var selector = event.data.selector;
+                        console.log(
+                            "Update selected element with selector:",
+                            selector,
+                        );
+                        if (selector) {
+                            try {
+                                var element = document.querySelector(selector);
+                                console.log(
+                                    "Found element by selector:",
+                                    element,
+                                );
+                                updateSelectedHighlight(element);
+                            } catch (error) {
+                                console.warn(
+                                    "Failed to select element:",
+                                    error,
+                                );
+                                updateSelectedHighlight(null);
+                            }
+                        } else {
+                            updateSelectedHighlight(null);
+                        }
+                    } else if (event.data.type === "clear-selected-element") {
+                        console.log("Clear selected element");
+                        updateSelectedHighlight(null);
+                    }
+                }
+
+                // 启用高亮功能
+                function enableHighlight() {
+                    console.log("Enabling highlight");
+                    document.addEventListener(
+                        "mouseover",
+                        handleMouseOver,
+                        true,
+                    );
+                    document.addEventListener("mouseout", handleMouseOut, true);
+                    document.addEventListener("click", handleClick, true);
+                    highlightEnabled = true;
+                    overlay.style.display = "block";
+                }
+
+                // 禁用高亮功能
+                function disableHighlight() {
+                    console.log("Disabling highlight");
+                    highlightEnabled = false;
+                    // 保持事件监听器，但通过 highlightEnabled 变量控制行为
+                    // 这样可以保留选中状态的显示
+                    highlightBox.style.display = "none";
+                    tagLabel.style.display = "none";
+                    // 不隐藏 selectedBox 和 selectedLabel，保留选中状态
+                }
+
+                // 完全禁用高亮功能（移除所有监听器）
+                function fullyDisableHighlight() {
+                    console.log("Fully disabling highlight");
+                    highlightEnabled = false;
+                    document.removeEventListener(
+                        "mouseover",
+                        handleMouseOver,
+                        true,
+                    );
+                    document.removeEventListener(
+                        "mouseout",
+                        handleMouseOut,
+                        true,
+                    );
+                    document.removeEventListener("click", handleClick, true);
+                    overlay.style.display = "none";
+                    highlightBox.style.display = "none";
+                    tagLabel.style.display = "none";
+                    selectedBox.style.display = "none";
+                    selectedLabel.style.display = "none";
+                }
+
+                // 添加事件监听
+                enableHighlight();
+                window.addEventListener("message", handleParentMessage);
+
+                // 暴露全局函数供外部调用
+                window.__iframeHighlightControl = {
+                    enable: enableHighlight,
+                    disable: disableHighlight,
+                    fullyDisable: fullyDisableHighlight,
+                    isEnabled: function isEnabled() {
+                        return highlightEnabled;
+                    },
+                    getSelectedElement: function getSelectedElement() {
+                        return selectedElement;
+                    },
+                    updateSelected: updateSelectedHighlight,
+                    // 通过消息发送开关控制
+                    sendToggleMessage: function sendToggleMessage(enabled) {
+                        window.parent.postMessage(
+                            {
+                                type: "iframe-highlight-status",
+                                enabled: enabled || highlightEnabled,
+                                source: "iframe-highlight-injector",
+                            },
+                            "*",
+                        );
+                    },
+                };
+
+                // 通知父窗口脚本已加载
+                try {
+                    window.parent.postMessage(
+                        {
+                            type: "iframe-highlight-ready",
+                            data: {
+                                url: window.location.href,
+                                userAgent: navigator.userAgent,
+                                timestamp: Date.now(),
+                            },
+                            source: "iframe-highlight-injector",
+                        },
+                        "*",
+                    );
+                } catch (error) {
+                    console.warn("无法发送就绪消息到父窗口:", error);
+                }
+
+                // 清理函数
+                window.__iframeHighlightCleanup = function () {
+                    fullyDisableHighlight();
+                    window.removeEventListener("message", handleParentMessage);
+                    if (overlay.parentElement) {
+                        overlay.parentElement.removeChild(overlay);
+                    }
+                    delete window.__iframeHighlightInitialized;
+                    delete window.__iframeHighlightCleanup;
+                };
+            })();
+        </script>
+    </body>
 </html>
