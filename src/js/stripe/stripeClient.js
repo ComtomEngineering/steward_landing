@@ -15,7 +15,7 @@ class StripeClient {
     this.cardElement = null;
     this.isInitialized = false;
     // this.baseUrl = "http://localhost:8000";
-    this.baseUrl = "http://api.steward.comtom.engineering";
+    this.baseUrl = "https://api.steward.comtom.engineering";
 
     // Pricing configuration
     this.products = {

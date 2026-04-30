@@ -21,7 +21,7 @@ const StripeConfig = {
   },
 
   // baseUrl: "http://localhost:8000",
-  baseUrl: "http://api.steward.comtom.engineering",
+  baseUrl: "https://api.steward.comtom.engineering",
 
   // Currency Configuration
   currency: "usd",
