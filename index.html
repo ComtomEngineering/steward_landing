@@ -1077,6 +1077,150 @@
             .skip-link:focus {
                 top: 0;
             }
+
+            /* Legal Modal (Privacy / Terms) */
+            .legal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.65);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 3000;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(4px);
+                padding: 24px;
+            }
+
+            .legal-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .legal-modal {
+                background: white;
+                border-radius: var(--radius-lg);
+                max-width: 720px;
+                width: 100%;
+                max-height: 85vh;
+                display: flex;
+                flex-direction: column;
+                box-shadow: var(--shadow-lg);
+                transform: translateY(20px);
+                transition: transform 0.3s ease;
+                overflow: hidden;
+            }
+
+            .legal-overlay.active .legal-modal {
+                transform: translateY(0);
+            }
+
+            .legal-modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 24px 32px;
+                border-bottom: 1px solid var(--gray-300);
+                flex-shrink: 0;
+            }
+
+            .legal-modal-header h2 {
+                font-size: 1.25rem;
+                font-weight: 800;
+                color: var(--text-primary);
+            }
+
+            .legal-modal-close {
+                width: 36px;
+                height: 36px;
+                border: none;
+                background: var(--bg-off-white);
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background var(--transition-fast);
+                flex-shrink: 0;
+            }
+
+            .legal-modal-close:hover {
+                background: var(--gray-300);
+            }
+
+            .legal-modal-close svg {
+                width: 18px;
+                height: 18px;
+                color: var(--text-secondary);
+            }
+
+            .legal-modal-body {
+                padding: 32px;
+                overflow-y: auto;
+                line-height: 1.7;
+                color: var(--text-primary);
+                font-size: 0.9375rem;
+            }
+
+            .legal-modal-body h3 {
+                font-size: 1.0625rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-top: 28px;
+                margin-bottom: 8px;
+            }
+
+            .legal-modal-body h3:first-child {
+                margin-top: 0;
+            }
+
+            .legal-modal-body p {
+                margin-bottom: 12px;
+                color: var(--text-secondary);
+            }
+
+            .legal-modal-body ul {
+                margin: 8px 0 16px 20px;
+                color: var(--text-secondary);
+            }
+
+            .legal-modal-body li {
+                margin-bottom: 4px;
+            }
+
+            .legal-modal-body strong {
+                color: var(--text-primary);
+            }
+
+            .legal-modal-body .effective-date {
+                font-size: 0.8125rem;
+                color: var(--text-secondary);
+                margin-bottom: 24px;
+                font-style: italic;
+            }
+
+            @media (max-width: 768px) {
+                .legal-overlay {
+                    padding: 16px;
+                }
+
+                .legal-modal {
+                    max-height: 90vh;
+                }
+
+                .legal-modal-header {
+                    padding: 20px 24px;
+                }
+
+                .legal-modal-body {
+                    padding: 24px;
+                }
+            }
         </style>
     </head>
     <body>
@@ -1960,10 +2104,13 @@
                     <nav class="footer-nav" aria-label="Footer navigation">
                         <a href="#features">Features</a>
                         <a href="#pricing">Pricing</a>
-                        <a href="#about">About</a>
                         <a href="https://medium.com/@AISteward">Blog</a>
-                        <a href="#">Privacy</a>
-                        <a href="#">Terms</a>
+                        <a href="#" class="legal-link" data-modal="privacy"
+                            >Privacy</a
+                        >
+                        <a href="#" class="legal-link" data-modal="terms"
+                            >Terms</a
+                        >
                     </nav>
                     <div class="social-links">
                         <a href="https://x.com/AISteward" aria-label="Twitter">
@@ -2030,6 +2177,31 @@
                 >
                     Great, thanks!
                 </button>
+            </div>
+        </div>
+
+        <!-- Legal Modal (Privacy / Terms) -->
+        <div id="legal-overlay" class="legal-overlay">
+            <div class="legal-modal" role="dialog" aria-modal="true">
+                <div class="legal-modal-header">
+                    <h2 id="legal-modal-title">Privacy Policy</h2>
+                    <button
+                        class="legal-modal-close"
+                        aria-label="Close"
+                        id="legal-modal-close"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="legal-modal-body" id="legal-modal-body"></div>
             </div>
         </div>
 
@@ -2186,6 +2358,158 @@
                         }
                     }
                 });
+            });
+
+            // ─── Legal Modal (Privacy / Terms) ───
+            const legalOverlay = document.getElementById("legal-overlay");
+            const legalTitle = document.getElementById("legal-modal-title");
+            const legalBody = document.getElementById("legal-modal-body");
+            const legalClose = document.getElementById("legal-modal-close");
+
+            const legalContent = {
+                privacy: {
+                    title: "Privacy Policy",
+                    body: `<p class="effective-date">Last updated: May 15, 2026</p>
+
+<h3>1. Introduction</h3>
+<p>Steward ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information when you use our services.</p>
+
+<h3>2. Information We Collect</h3>
+<p>We collect only the information that is strictly necessary to provide our service to you. Specifically, we collect:</p>
+<ul>
+<li><strong>Email address</strong> — used to deliver your personalized AI news briefings, communicate about your subscription, and provide customer support.</li>
+</ul>
+<p>We do <strong>not</strong> collect any other personal data, including but not limited to: browsing behavior, location data, device identifiers, IP addresses (beyond what payment processors may collect), or any form of tracking cookies.</p>
+
+<h3>3. How We Use Your Information</h3>
+<p>We use your email address solely for the following purposes:</p>
+<ul>
+<li>Delivering your AI-curated news briefings (daily or weekly, per your preference)</li>
+<li>Processing your subscription and billing</li>
+<li>Sending service-related communications (e.g., billing confirmations, policy updates)</li>
+<li>Responding to your support requests</li>
+</ul>
+
+<h3>4. Payment Processing</h3>
+<p>We use Stripe as our payment processor. All payment information is handled directly by Stripe and is never stored on our servers. Stripe's privacy policy is available at <a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a>.</p>
+
+<h3>5. Data Sharing</h3>
+<p>We do not sell, trade, or share your personal information with third parties. Your email address is only shared with service providers necessary to deliver our service (e.g., our email delivery provider), who are bound by confidentiality agreements.</p>
+
+<h3>6. Data Retention</h3>
+<p>We retain your email address and subscription details only for as long as your account is active or as needed to provide you with our service. If you cancel your subscription, you may request that we delete your data entirely.</p>
+
+<h3>7. Your Rights</h3>
+<p>You have the right to:</p>
+<ul>
+<li><strong>Access</strong> — request a copy of the personal data we hold about you</li>
+<li><strong>Correction</strong> — request that we correct any inaccurate data</li>
+<li><strong>Deletion</strong> — request that we delete your personal data</li>
+<li><strong>Unsubscribe</strong> — stop receiving our briefings at any time via the unsubscribe link in every email</li>
+</ul>
+<p>To exercise any of these rights, email us at <strong>steward@comtom.engineering</strong>.</p>
+
+<h3>8. Data Security</h3>
+<p>We implement appropriate technical and organizational measures to protect your email address against unauthorized access, alteration, or destruction. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.</p>
+
+<h3>9. Children's Privacy</h3>
+<p>Our service is not directed to individuals under the age of 18. We do not knowingly collect personal information from children.</p>
+
+<h3>10. Changes to This Policy</h3>
+<p>We may update this Privacy Policy from time to time. When we make changes, we will update the "Last updated" date at the top of this page. If we make material changes, we will notify you via email.</p>
+
+<h3>11. Contact Us</h3>
+<p>If you have questions about this Privacy Policy or our data practices, please contact us at:</p>
+<p><strong>steward@comtom.engineering</strong></p>`,
+                },
+                terms: {
+                    title: "Terms of Service",
+                    body: `<p class="effective-date">Last updated: May 15, 2026</p>
+
+<h3>1. Acceptance of Terms</h3>
+<p>By subscribing to or using Steward ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our Service.</p>
+
+<h3>2. Description of Service</h3>
+<p>Steward provides AI-curated news briefings delivered via email. You can choose between daily or weekly briefings. Our AI system curates and summarizes news content from various sources and delivers a personalized briefing to your email inbox.</p>
+
+<h3>3. Subscription and Payment</h3>
+<ul>
+<li><strong>Plans</strong> — We offer monthly and annual subscription plans. Pricing is displayed on our website and may change with notice.</li>
+<li><strong>Payment</strong> — Payments are processed securely via Stripe. Your payment method will be billed at the start of each billing cycle.</li>
+<li><strong>Refunds</strong> — We offer a 7-day free trial on all plans. After the trial, we generally do not offer refunds for partial billing periods. For exceptional cases, contact us at <strong>steward@comtom.engineering</strong>.</li>
+</ul>
+
+<h3>4. Cancellation</h3>
+<p>You may cancel your subscription at any time. Upon cancellation, you will continue to receive briefings until the end of your current billing period. No proration or refunds will be issued for the remaining period.</p>
+
+<h3>5. User Conduct</h3>
+<p>You agree not to:</p>
+<ul>
+<li>Share your account credentials or subscription with others</li>
+<li>Use the Service for any unlawful purpose</li>
+<li>Attempt to reverse-engineer, scrape, or automate access to our content</li>
+<li>Resell or redistribute briefings without our express written permission</li>
+</ul>
+
+<h3>6. Content License</h3>
+<p>The briefings we deliver are protected by copyright and other intellectual property laws. You may use them for personal, non-commercial purposes only. Redistribution, republication, or commercial use requires prior written consent from Steward.</p>
+
+<h3>7. Intellectual Property</h3>
+<p>All content, branding, AI models, and curation methods used by Steward are the exclusive property of Steward and its licensors. These Terms grant you a limited, non-exclusive, non-transferable license to access the Service for personal use.</p>
+
+<h3>8. Disclaimers and Limitation of Liability</h3>
+<p>The Service is provided "as is" without warranties of any kind. We do not guarantee that the news summaries are error-free, complete, or fit for a particular purpose. To the maximum extent permitted by law, Steward shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
+
+<h3>9. Modifications to the Service</h3>
+<p>We reserve the right to modify, suspend, or discontinue any aspect of the Service at any time. We may also change these Terms at any time. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
+
+<h3>10. Governing Law</h3>
+<p>These Terms are governed by the laws of the jurisdiction in which Steward operates, without regard to conflict of law principles. Any disputes shall be resolved through binding arbitration on an individual basis.</p>
+
+<h3>11. Contact</h3>
+<p>For questions about these Terms, contact us at:</p>
+<p><strong>steward@comtom.engineering</strong></p>`,
+                },
+            };
+
+            function openLegalModal(type) {
+                const content = legalContent[type];
+                if (!content) return;
+                legalTitle.textContent = content.title;
+                legalBody.innerHTML = content.body;
+                legalOverlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+                // Focus the close button for accessibility
+                legalClose.focus();
+            }
+
+            function closeLegalModal() {
+                legalOverlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+
+            // Open modal from footer links
+            document.querySelectorAll(".legal-link").forEach((link) => {
+                link.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const type = link.getAttribute("data-modal");
+                    openLegalModal(type);
+                });
+            });
+
+            // Close modal
+            legalClose.addEventListener("click", closeLegalModal);
+            legalOverlay.addEventListener("click", (e) => {
+                if (e.target === legalOverlay) closeLegalModal();
+            });
+            // Close on Escape key
+            document.addEventListener("keydown", (e) => {
+                if (
+                    e.key === "Escape" &&
+                    legalOverlay.classList.contains("active")
+                ) {
+                    closeLegalModal();
+                }
             });
         </script>
 
